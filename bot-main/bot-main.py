@@ -1,3 +1,0 @@
-import yaml
-import discord
-

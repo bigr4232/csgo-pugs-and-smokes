@@ -3,6 +3,7 @@ from discord import app_commands
 import config_loader
 import command_sender
 import asyncio
+from requests import get
 
 # Intents and tree inits
 intents = discord.Intents.default()
@@ -12,6 +13,20 @@ managers = {}
 tree = app_commands.CommandTree(client)
 config = config_loader.loadYaml()
 gamemode = 'nade-practice'
+ip = get('https://api.ipify.org').content.decode('utf8')
+if '-port' in config['startCommand']:
+    portStr = config['startCommand'][config['startCommand'].find('-port')+6:]
+    port = portStr[0:portStr.find(' ')]
+else:
+    port = '27015'
+serverPassword = ''
+
+# Class for connect to server button
+class ButtonForServer(discord.ui.View):
+    async def __init__(self, query: str):
+        super().__init__()
+        url = f'steam://connect/{ip}:{port}/{serverPassword}'
+        self.add_item(discord.ui.Button(label='Connect', url=url))
 
 # Checks if user has the role with a role ID as input
 async def checkIfUserHasRole(roles, roleID):
@@ -35,6 +50,8 @@ async def startServerCommand(ctx: discord.Interaction):
     if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
         await ctx.response.send_message('Starting Counter Strike server.', delete_after=30)
         await command_sender.startServer(config['startCommand'])
+        await asyncio.sleep(10)
+        serverPassword = await command_sender.getPassword()
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
@@ -54,6 +71,8 @@ async def startServerCommand(ctx: discord.Interaction):
         await ctx.response.send_message('Restarting Counter Strike server.', delete_after=30)
         await command_sender.stopServer()
         await command_sender.startServer(config['startCommand'])
+        await asyncio.sleep(10)
+        serverPassword = await command_sender.getPassword()
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
@@ -89,7 +108,7 @@ async def changeMap(ctx: discord.Interaction, option:app_commands.Choice[str]):
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
 # Send server command
-@tree.command(name='sendServerCommand', description='Send a command to the server', guild=discord.Object(id=config['discordGuildID']))
+@tree.command(name='send-server-command', description='Send a command to the server', guild=discord.Object(id=config['discordGuildID']))
 async def sendServerCommand(ctx: discord.Interaction, command: str):
     if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
         await ctx.response.send_message(f'Sending command to server {command}', delete_after=30)
@@ -99,10 +118,16 @@ async def sendServerCommand(ctx: discord.Interaction, command: str):
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
+# Get server info command
+@tree.command(name='get-server-info', description='Get info to connect to cs server', guild=discord.Object(id=config['discordGuildID']))
+async def getServerInfo(ctx: discord.Interaction):
+    serverPassword = await command_sender.getPassword()
+    await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}',view=ButtonForServer(), delete_after=200)
 
 # Initialization
 @client.event
 async def on_ready():
+    serverPassword = await command_sender.getPassword()
     print("connected")
 
 client.run(config['discordBotToken'])

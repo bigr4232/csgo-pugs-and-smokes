@@ -1,10 +1,22 @@
 import subprocess
+import asyncio
 
 # Initalize a command
 async def initCommand(inputCommand):
     inputCommand = inputCommand + '^M'
-    command = ['screen', '-S', 'csgoServer', '-X', 'stuff', inputCommand]
+    command = ['screen', '-S', 'csgoServer', '-p0', '-X', 'stuff', inputCommand]
     return command
+
+async def getServerOutput(command):
+    await asyncio.sleep(.5)
+    subprocess.run(['screen', '-r', 'csgoServer', '-p0', '-X', 'hardcopy', 'output.txt'])
+    with open('output.txt') as f:
+        lines = f.readlines()
+    subprocess.run(['rm', 'output.txt'])
+    for line in reversed(lines):
+        if command+' = ' in line:
+            return line[14:line.find('\n')]
+    return ''
 
 # Send terminal command to start server
 async def startServer(startCommand):
@@ -31,4 +43,11 @@ async def changemap(map):
 async def sendCMD(command):
     cmd = await initCommand(command)
     response = subprocess.run(cmd, capture_output=True)
+    return response
+
+# Get server password
+async def getPassword():
+    cmd = await initCommand('sv_password')
+    subprocess.run(cmd)
+    response = await getServerOutput('sv_password')
     return response

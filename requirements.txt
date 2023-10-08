@@ -1,2 +1,3 @@
 pyyaml >= 3.12
 discord.py >= 2.3.2
+reqests >= 2.31.0

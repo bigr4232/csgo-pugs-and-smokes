@@ -1,4 +1,6 @@
-discordBotToken: 
-discordChannel: 
+discordBotToken:
+discordChannel:
+discordAdminRole:
 discordGuildID:
 discordOwnerID:
+startCommand:

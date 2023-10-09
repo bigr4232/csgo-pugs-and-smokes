@@ -38,7 +38,7 @@ async def checkIfUserHasRole(roles, roleID):
     return False
 
 # Command to sync new slash commands
-@tree.command(name='sync-commands', description='command to sync new slash commands', guild=discord.Object(id=config['discordGuildID']))
+@tree.command(name='sync-commands', description='command to sync new slash commands')
 async def syncCommands(ctx: discord.Interaction):
     if ctx.user.id == int(config['discordOwnerID']):
         await tree.sync(guild=discord.Object(id=config['discordGuildID']))
@@ -47,7 +47,7 @@ async def syncCommands(ctx: discord.Interaction):
         await ctx.response.send_message('This command is only for the server owner.', delete_after=30)
 
 # Start server command
-@tree.command(name='start-server', description='send command to server to start', guild=discord.Object(id=config['discordGuildID']))
+@tree.command(name='start-server', description='send command to server to start')
 async def startServerCommand(ctx: discord.Interaction):
     if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
         await ctx.response.send_message('Starting Counter Strike server.', delete_after=30)
@@ -58,7 +58,7 @@ async def startServerCommand(ctx: discord.Interaction):
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
 # Stop server command
-@tree.command(name='stop-server', description='send command to server to stop', guild=discord.Object(id=config['discordGuildID']))
+@tree.command(name='stop-server', description='send command to server to stop')
 async def startServerCommand(ctx: discord.Interaction):
     if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
         await ctx.response.send_message('Stopping Counter Strike server.', delete_after=30)
@@ -67,7 +67,7 @@ async def startServerCommand(ctx: discord.Interaction):
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
         
 # Restart server command
-@tree.command(name='restart-server', description='send command to server to restart', guild=discord.Object(id=config['discordGuildID']))
+@tree.command(name='restart-server', description='send command to server to restart')
 async def startServerCommand(ctx: discord.Interaction):
     if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
         await ctx.response.send_message('Restarting Counter Strike server.', delete_after=30)
@@ -79,7 +79,7 @@ async def startServerCommand(ctx: discord.Interaction):
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
 # Start gamemode
-@tree.command(name='gamemode', description='start gamemode on the server specified by the option', guild=discord.Object(id=config['discordGuildID']))
+@tree.command(name='gamemode', description='start gamemode on the server specified by the option')
 @app_commands.choices(option=[app_commands.Choice(name='nade-practice', value='nade-practice')])
 async def serverGameModeCommand(ctx: discord.Interaction, option:app_commands.Choice[str]):
     if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
@@ -91,7 +91,7 @@ async def serverGameModeCommand(ctx: discord.Interaction, option:app_commands.Ch
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
 # Change map
-@tree.command(name='changemap', description='changemap to specified map', guild=discord.Object(id=config['discordGuildID']))
+@tree.command(name='changemap', description='changemap to specified map')
 @app_commands.choices(option=[app_commands.Choice(name='ancient', value='ancient'),
                               app_commands.Choice(name='anubis', value='anubis'),
                               app_commands.Choice(name='dust2', value='dust2'),
@@ -110,7 +110,7 @@ async def changeMap(ctx: discord.Interaction, option:app_commands.Choice[str]):
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
 # Send server command
-@tree.command(name='send-server-command', description='Send a command to the server', guild=discord.Object(id=config['discordGuildID']))
+@tree.command(name='send-server-command', description='Send a command to the server')
 async def sendServerCommand(ctx: discord.Interaction, command: str):
     if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
         await ctx.response.send_message(f'Sending command to server {command}', delete_after=30)
@@ -121,7 +121,7 @@ async def sendServerCommand(ctx: discord.Interaction, command: str):
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
 # Get server info command
-@tree.command(name='get-server-info', description='Get info to connect to cs server', guild=discord.Object(id=config['discordGuildID']))
+@tree.command(name='get-server-info', description='Get info to connect to cs server')
 async def getServerInfo(ctx: discord.Interaction):
     serverPassword = await command_sender.getPassword()
     await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', delete_after=300)
@@ -130,6 +130,7 @@ async def getServerInfo(ctx: discord.Interaction):
 @client.event
 async def on_ready():
     serverPassword = await command_sender.getPassword()
+    tree.sync()
     print("connected")
 
 client.run(config['discordBotToken'])

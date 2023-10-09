@@ -130,7 +130,7 @@ async def getServerInfo(ctx: discord.Interaction):
 @client.event
 async def on_ready():
     serverPassword = await command_sender.getPassword()
-    tree.sync()
+    await tree.sync()
     print("connected")
 
 client.run(config['discordBotToken'])

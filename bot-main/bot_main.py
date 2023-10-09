@@ -21,9 +21,11 @@ else:
     port = '27015'
 serverPassword = ''
 
+# TODO discord.py api needs support for steam:// implementation for the button to work
+# This will be implemented in the get-server-info commands
 # Class for connect to server button
 class ButtonForServer(discord.ui.View):
-    async def __init__(self, query: str):
+    def __init__(self):
         super().__init__()
         url = f'steam://connect/{ip}:{port}/{serverPassword}'
         self.add_item(discord.ui.Button(label='Connect', url=url))
@@ -122,7 +124,7 @@ async def sendServerCommand(ctx: discord.Interaction, command: str):
 @tree.command(name='get-server-info', description='Get info to connect to cs server', guild=discord.Object(id=config['discordGuildID']))
 async def getServerInfo(ctx: discord.Interaction):
     serverPassword = await command_sender.getPassword()
-    await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}',view=ButtonForServer(), delete_after=200)
+    await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', delete_after=300)
 
 # Initialization
 @client.event

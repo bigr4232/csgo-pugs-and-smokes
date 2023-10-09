@@ -1,5 +1,6 @@
 import subprocess
 import asyncio
+import os
 
 # Initalize a command
 async def initCommand(inputCommand):
@@ -9,7 +10,8 @@ async def initCommand(inputCommand):
 
 async def getServerOutput(command):
     await asyncio.sleep(.5)
-    subprocess.run(['screen', '-r', 'csgoServer', '-p0', '-X', 'hardcopy', 'output.txt'])
+    path = os. getcwd() + '/output.txt'
+    subprocess.run(['screen', '-r', 'csgoServer', '-p0', '-X', 'hardcopy', path])
     with open('output.txt') as f:
         lines = f.readlines()
     subprocess.run(['rm', 'output.txt'])

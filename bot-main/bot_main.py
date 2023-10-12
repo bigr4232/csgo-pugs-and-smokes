@@ -23,6 +23,10 @@ else:
     port = '27015'
 serverPassword = ''
 
+logger = logging.getLogger('logs')
+logger.setLevel(logging.INFO)
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+
 # TODO discord.py api needs support for steam:// implementation for the button to work
 # This will be implemented in the get-server-info commands
 # Class for connect to server button
@@ -168,6 +172,6 @@ async def getServerInfo(ctx: discord.Interaction):
 @client.event
 async def on_ready():
     await tree.sync()
-    print("connected")
+    logger.info("connected")
 
 client.run(config['discordBotToken'])

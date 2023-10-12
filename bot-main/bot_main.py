@@ -1,9 +1,11 @@
 import discord
 from discord import app_commands
+from discord.ext import tasks
 import config_loader
 import command_sender
 import asyncio
 from requests import get
+import logging
 
 # Intents and tree inits
 intents = discord.Intents.default()
@@ -41,7 +43,7 @@ async def checkIfUserHasRole(roles, roleID):
 @tree.command(name='sync-commands', description='command to sync new slash commands')
 async def syncCommands(ctx: discord.Interaction):
     if ctx.user.id == int(config['discordOwnerID']):
-        await tree.sync()
+        await tree.sync(guild=discord.Object(id=config['discordGuildID']))
         await ctx.response.send_message('Commands synced', delete_after=30)
     else:
         await ctx.response.send_message('This command is only for the server owner.', delete_after=30)
@@ -49,7 +51,13 @@ async def syncCommands(ctx: discord.Interaction):
 # Start server command
 @tree.command(name='start-server', description='send command to server to start')
 async def startServerCommand(ctx: discord.Interaction):
-    if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
+    if not ctx.guild:
+        guild = client.get_guild(int(config['discordGuildID']))
+        member = await guild.fetch_member(ctx.user.id)
+        memberRoles = member.roles
+    else:
+        memberRoles = ctx.user.roles
+    if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Starting Counter Strike server.', delete_after=30)
         await command_sender.startServer(config['startCommand'])
         await asyncio.sleep(10)
@@ -60,7 +68,13 @@ async def startServerCommand(ctx: discord.Interaction):
 # Stop server command
 @tree.command(name='stop-server', description='send command to server to stop')
 async def startServerCommand(ctx: discord.Interaction):
-    if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
+    if not ctx.guild:
+        guild = client.get_guild(int(config['discordGuildID']))
+        member = await guild.fetch_member(ctx.user.id)
+        memberRoles = member.roles
+    else:
+        memberRoles = ctx.user.roles
+    if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Stopping Counter Strike server.', delete_after=30)
         await command_sender.stopServer()
     else:
@@ -69,7 +83,13 @@ async def startServerCommand(ctx: discord.Interaction):
 # Restart server command
 @tree.command(name='restart-server', description='send command to server to restart')
 async def startServerCommand(ctx: discord.Interaction):
-    if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
+    if not ctx.guild:
+        guild = client.get_guild(int(config['discordGuildID']))
+        member = await guild.fetch_member(ctx.user.id)
+        memberRoles = member.roles
+    else:
+        memberRoles = ctx.user.roles
+    if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Restarting Counter Strike server.', delete_after=30)
         await command_sender.stopServer()
         await command_sender.startServer(config['startCommand'])
@@ -82,7 +102,13 @@ async def startServerCommand(ctx: discord.Interaction):
 @tree.command(name='gamemode', description='start gamemode on the server specified by the option')
 @app_commands.choices(option=[app_commands.Choice(name='nade-practice', value='nade-practice')])
 async def serverGameModeCommand(ctx: discord.Interaction, option:app_commands.Choice[str]):
-    if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
+    if not ctx.guild:
+        guild = client.get_guild(int(config['discordGuildID']))
+        member = await guild.fetch_member(ctx.user.id)
+        memberRoles = member.roles
+    else:
+        memberRoles = ctx.user.roles
+    if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message(f'Switching server to gamemode {option.value}', delete_after=30)
         global gamemode
         gamemode = 'nade-practice'
@@ -101,7 +127,13 @@ async def serverGameModeCommand(ctx: discord.Interaction, option:app_commands.Ch
                               app_commands.Choice(name='overpass', value='overpass'),
                               app_commands.Choice(name='vertigo', value='vertigo')])
 async def changeMap(ctx: discord.Interaction, option:app_commands.Choice[str]):
-    if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
+    if not ctx.guild:
+        guild = client.get_guild(int(config['discordGuildID']))
+        member = await guild.fetch_member(ctx.user.id)
+        memberRoles = member.roles
+    else:
+        memberRoles = ctx.user.roles
+    if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message(f'Switching server to the map {option.value}', delete_after=30)
         await command_sender.changemap(option.value)
         await asyncio.sleep(10)
@@ -112,7 +144,13 @@ async def changeMap(ctx: discord.Interaction, option:app_commands.Choice[str]):
 # Send server command
 @tree.command(name='send-server-command', description='Send a command to the server')
 async def sendServerCommand(ctx: discord.Interaction, command: str):
-    if await checkIfUserHasRole(ctx.user.roles, config['discordAdminRole']):
+    if not ctx.guild:
+        guild = client.get_guild(int(config['discordGuildID']))
+        member = await guild.fetch_member(ctx.user.id)
+        memberRoles = member.roles
+    else:
+        memberRoles = ctx.user.roles
+    if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message(f'Sending command to server {command}', delete_after=30)
         resp = await command_sender.sendCMD(command)
         if resp != '':
@@ -129,7 +167,6 @@ async def getServerInfo(ctx: discord.Interaction):
 # Initialization
 @client.event
 async def on_ready():
-    serverPassword = await command_sender.getPassword()
     await tree.sync()
     print("connected")
 

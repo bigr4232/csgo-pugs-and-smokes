@@ -1,6 +1,5 @@
 import discord
 from discord import app_commands
-from discord.ext import tasks
 import config_loader
 import command_sender
 import asyncio

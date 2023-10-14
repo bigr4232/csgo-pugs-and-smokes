@@ -64,7 +64,7 @@ async def startServerCommand(ctx: discord.Interaction):
         await ctx.response.send_message('Starting Counter Strike server.', delete_after=30)
         serverPassword = await command_sender.startServer(config['startCommand'])
         await asyncio.sleep(6)
-        await ctx.channel.send(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', delete_after=300)
+        await ctx.channel.send(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
@@ -163,7 +163,7 @@ async def sendServerCommand(ctx: discord.Interaction, command: str):
 @tree.command(name='get-server-info', description='Get info to connect to cs server')
 async def getServerInfo(ctx: discord.Interaction):
     serverPassword = await command_sender.getPassword()
-    await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', delete_after=300)
+    await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024')
 
 @tree.command(name='update-server', description='Update cs2 server if there is an update available')
 async def updateServer(ctx: discord.Interaction):
@@ -177,7 +177,7 @@ async def updateServer(ctx: discord.Interaction):
         await ctx.response.defer()
         serverPassword = await command_sender.updateServer(config['steamCMDInstallPath'], config['csgoServerInstallPath'], config['startCommand'], config['serverLoginUsername'], config['serverLoginPassword'])
         await ctx.followup.send('Server is updated and running.')
-        await ctx.channel.send(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', delete_after=300)
+        await ctx.channel.send(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 

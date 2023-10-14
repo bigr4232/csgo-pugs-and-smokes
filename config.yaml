@@ -6,3 +6,5 @@ discordOwnerID:
 startCommand:
 csgoServerInstallPath:
 steamCMDInstallPath:
+serverLoginUsername:
+serverLoginPassword:

@@ -58,9 +58,9 @@ async def getPassword():
     return response
 
 # Update server
-async def updateServer(steamCMDpath, csgoServerPath, startCommand):
+async def updateServer(steamCMDpath, csgoServerPath, startCommand, username, password):
     await stopServer()
-    cmd = f'{steamCMDpath} +force_install_dir {csgoServerPath} +login anonymous +app_update 730 +quit'
+    cmd = f'{steamCMDpath} +force_install_dir {csgoServerPath} +login {username} {password} +app_update 730 +quit'
     subprocess.run(cmd, shell=True)
     return await startServer(startCommand)
 

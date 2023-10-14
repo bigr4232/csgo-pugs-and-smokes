@@ -25,6 +25,9 @@ async def startServer(startCommand):
     subprocess.run(['screen', '-dmS', 'csgoServer'])
     cmd = await initCommand(startCommand)
     subprocess.run(cmd)
+    await asyncio.sleep(6)
+    return await getPassword()
+
 
 # Send terminal command to stop server
 async def stopServer():
@@ -53,3 +56,11 @@ async def getPassword():
     subprocess.run(cmd)
     response = await getServerOutput('sv_password')
     return response
+
+# Update server
+async def updateServer(steamCMDpath, csgoServerPath, startCommand):
+    await stopServer()
+    cmd = f'{steamCMDpath} +force_install_dir {csgoServerPath} +login anonymous +app_update 730 +quit'
+    subprocess.run(cmd, shell=True)
+    return await startServer(startCommand)
+

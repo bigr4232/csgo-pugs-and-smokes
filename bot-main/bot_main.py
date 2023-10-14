@@ -62,9 +62,9 @@ async def startServerCommand(ctx: discord.Interaction):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Starting Counter Strike server.', delete_after=30)
-        await command_sender.startServer(config['startCommand'])
-        await asyncio.sleep(10)
-        serverPassword = await command_sender.getPassword()
+        serverPassword = await command_sender.startServer(config['startCommand'])
+        await asyncio.sleep(6)
+        await ctx.channel.send(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', delete_after=300)
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
@@ -96,8 +96,6 @@ async def startServerCommand(ctx: discord.Interaction):
         await ctx.response.send_message('Restarting Counter Strike server.', delete_after=30)
         await command_sender.stopServer()
         await command_sender.startServer(config['startCommand'])
-        await asyncio.sleep(10)
-        serverPassword = await command_sender.getPassword()
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
@@ -167,10 +165,26 @@ async def getServerInfo(ctx: discord.Interaction):
     serverPassword = await command_sender.getPassword()
     await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', delete_after=300)
 
+@tree.command(name='update-server', description='Update cs2 server if there is an update available')
+async def updateServer(ctx: discord.Interaction):
+    if not ctx.guild:
+        guild = client.get_guild(int(config['discordGuildID']))
+        member = await guild.fetch_member(ctx.user.id)
+        memberRoles = member.roles
+    else:
+        memberRoles = ctx.user.roles
+    if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
+        await ctx.response.defer()
+        serverPassword = await command_sender.updateServer(config['steamCMDInstallPath'], config['csgoServerInstallPath'], config['startCommand'])
+        await ctx.followup.send('Server is updated and running.')
+        await ctx.channel.send(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', delete_after=300)
+    else:
+        await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
+
 # Initialization
 @client.event
 async def on_ready():
-    await tree.sync()
+    #await tree.sync()
     logger.info("connected")
 
 client.run(config['discordBotToken'])

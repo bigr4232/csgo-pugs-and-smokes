@@ -4,3 +4,5 @@ discordAdminRole:
 discordGuildID:
 discordOwnerID:
 startCommand:
+csgoServerInstallPath:
+steamCMDInstallPath:

@@ -14,6 +14,7 @@ managers = {}
 tree = app_commands.CommandTree(client)
 config = config_loader.loadYaml()
 gamemode = 'nade-practice'
+tenManPlayers = dict()
 ip = get('https://api.ipify.org').content.decode('utf8')
 if '-port' in config['startCommand']:
     portStr = config['startCommand'][config['startCommand'].find('-port')+6:]
@@ -35,12 +36,31 @@ class ButtonForServer(discord.ui.View):
         url = f'steam://connect/{ip}:{port}/{serverPassword}'
         self.add_item(discord.ui.Button(label='Connect', url=url))
 
+# Class for 10 mans buttons
+class TenMansButton(discord.ui.View):
+    def __init__(self, *, timeout=None):
+        super().__init__(timeout=timeout)
+    @discord.ui.button(label="Join",style=discord.ButtonStyle.green)
+    async def green_button(self, ctx:discord.Interaction, button:discord.ui.Button):
+        print('button pressed')
+        await ctx.response.edit_message(content = 'kldfjas')
+
 # Checks if user has the role with a role ID as input
 async def checkIfUserHasRole(roles, roleID):
     for role in roles:
         if role.id == roleID:
             return True
     return False
+
+# Ten mans discord command
+@tree.command(name='ten-mans', description='start 10 mans')
+@app_commands.choices(option=[app_commands.Choice(name='start', value='start'),
+                              app_commands.Choice(name='cancel', value='cancel'),])
+async def tenMans(ctx: discord.Interaction, option:app_commands.Choice[str]):
+    if option.name == 'start':
+        await ctx.response.send_message('0 players joined', view=TenMansButton())
+    elif option.name == 'cancel':
+        print()
 
 # Start server command
 @tree.command(name='start-server', description='send command to server to start')
@@ -173,7 +193,7 @@ async def updateServer(ctx: discord.Interaction):
 # Initialization
 @client.event
 async def on_ready():
-    await tree.sync()
+    #await tree.sync()
     logger.info("connected")
 
 client.run(config['discordBotToken'])

@@ -42,15 +42,6 @@ async def checkIfUserHasRole(roles, roleID):
             return True
     return False
 
-# Command to sync new slash commands
-@tree.command(name='sync-commands', description='command to sync new slash commands')
-async def syncCommands(ctx: discord.Interaction):
-    if ctx.user.id == int(config['discordOwnerID']):
-        await tree.sync(guild=discord.Object(id=config['discordGuildID']))
-        await ctx.response.send_message('Commands synced', delete_after=30)
-    else:
-        await ctx.response.send_message('This command is only for the server owner.', delete_after=30)
-
 # Start server command
 @tree.command(name='start-server', description='send command to server to start')
 async def startServerCommand(ctx: discord.Interaction):
@@ -184,7 +175,7 @@ async def updateServer(ctx: discord.Interaction):
 # Initialization
 @client.event
 async def on_ready():
-    #await tree.sync()
+    await tree.sync()
     logger.info("connected")
 
 client.run(config['discordBotToken'])

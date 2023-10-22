@@ -54,8 +54,6 @@ async def startServerCommand(ctx: discord.Interaction):
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Starting Counter Strike server.', delete_after=30)
         serverPassword = await command_sender.startServer(config['startCommand'])
-        await asyncio.sleep(6)
-        await ctx.channel.send(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 

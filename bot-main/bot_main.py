@@ -48,12 +48,8 @@ class TenMansButton(discord.ui.View):
         logger.debug(f'button pressed by {ctx.user.id}')
         if ctx.user not in tenManPlayers[ctx.guild.id]:
             tenManPlayers[ctx.guild.id].add(ctx.user)
-            button.label='Leave'
-            button.style=discord.ButtonStyle.red
         else:
             tenManPlayers[ctx.guild.id].remove(ctx.user)
-            button.label='Join'
-            button.style=discord.ButtonStyle.green
         await ctx.response.edit_message(content = f'{len(tenManPlayers[ctx.guild.id])}/10 players joined', view=self)
         if len(tenManPlayers[ctx.guild.id]) == 10:
             logger.debug('Starting 10 mans')
@@ -90,7 +86,7 @@ async def checkIfUserHasRole(roles, roleID):
 async def tenMans(ctx: discord.Interaction, option:app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called ten-mans command with option {option.name}')
     if option.name == 'start':
-        if tenManMessage[ctx.guild.id] != 0:
+        if ctx.guild.id not in tenManMessage or tenManMessage[ctx.guild.id] == 0:
             await ctx.response.send_message('Starting 10 mans')
             message = await ctx.channel.send('0/10 players joined', view=TenMansButton())
             tenManMessage.update({ctx.guild.id : message})

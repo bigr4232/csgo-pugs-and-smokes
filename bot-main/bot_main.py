@@ -57,8 +57,6 @@ class TenMansButton(discord.ui.View):
             await ctx.channel.send(f'Team 1: {sortedList[0].mention}, {sortedList[1].mention}, {sortedList[2].mention}, {sortedList[3].mention}, {sortedList[4].mention}\nTeam 2: {sortedList[5].mention}, {sortedList[6].mention}, {sortedList[7].mention}, {sortedList[8].mention}, {sortedList[9].mention}')
             ctx.message.delete(tenManMessage[ctx.guild.id])
 
-
-
 # Randomize teams for 10 mans
 async def randomizeTeams(unsortedSet):
     logger.debug('Randomizing teams')

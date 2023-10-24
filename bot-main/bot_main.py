@@ -45,17 +45,21 @@ class TenMansButton(discord.ui.View):
         super().__init__(timeout=timeout)
     @discord.ui.button(label='Join',style=discord.ButtonStyle.green)
     async def green_button(self, ctx:discord.Interaction, button:discord.ui.Button):
-        logger.debug(f'button pressed by {ctx.user.id}')
+        logger.debug(f'green button pressed by {ctx.user.id}')
         if ctx.user not in tenManPlayers[ctx.guild.id]:
             tenManPlayers[ctx.guild.id].add(ctx.user)
-        else:
-            tenManPlayers[ctx.guild.id].remove(ctx.user)
         await ctx.response.edit_message(content = f'{len(tenManPlayers[ctx.guild.id])}/10 players joined', view=self)
         if len(tenManPlayers[ctx.guild.id]) == 10:
             logger.debug('Starting 10 mans')
             sortedList = await randomizeTeams(tenManPlayers[ctx.guild.id])
             await ctx.channel.send(f'Team 1: {sortedList[0].mention}, {sortedList[1].mention}, {sortedList[2].mention}, {sortedList[3].mention}, {sortedList[4].mention}\nTeam 2: {sortedList[5].mention}, {sortedList[6].mention}, {sortedList[7].mention}, {sortedList[8].mention}, {sortedList[9].mention}')
             ctx.message.delete(tenManMessage[ctx.guild.id])
+    @discord.ui.button(label='leave', style=discord.ButtonStyle.red)
+    async def red_button(self, ctx:discord.Interaction, button:discord.ui.Button):
+        logger.debug(f'red button pressed by {ctx.user.id}')
+        if ctx.user in tenManPlayers[ctx.guild.id]:
+            tenManPlayers[ctx.guild.id].remove(ctx.user)
+        await ctx.response.edit_message(content = f'{len(tenManPlayers[ctx.guild.id])}/10 players joined', view=self)
 
 # Randomize teams for 10 mans
 async def randomizeTeams(unsortedSet):
@@ -92,9 +96,12 @@ async def tenMans(ctx: discord.Interaction, option:app_commands.Choice[str]):
         else:
             await ctx.response.send_message('10 mans already started. Please cancel before starting again')
     elif option.name == 'cancel':
-        await ctx.response.send_message('Ending 10 mans', delete_after=30)
-        await tenManMessage[ctx.guild.id].delete()
-        tenManMessage.update({ctx.guild.id, 0})
+        if ctx.guild.id in tenManMessage:
+            await ctx.response.send_message('Ending 10 mans', delete_after=30)
+            await tenManMessage[ctx.guild.id].delete()
+            tenManMessage.pop(ctx.guild.id)
+        else:
+            await ctx.response.send_message('No 10 mans running', delete_after=30)
 
 # Start server command
 @tree.command(name='start-server', description='send command to server to start')

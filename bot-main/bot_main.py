@@ -53,7 +53,8 @@ class TenMansButton(discord.ui.View):
             logger.debug('Starting 10 mans')
             sortedList = await randomizeTeams(tenManPlayers[ctx.guild.id])
             await ctx.channel.send(f'Team 1: {sortedList[0].mention}, {sortedList[1].mention}, {sortedList[2].mention}, {sortedList[3].mention}, {sortedList[4].mention}\nTeam 2: {sortedList[5].mention}, {sortedList[6].mention}, {sortedList[7].mention}, {sortedList[8].mention}, {sortedList[9].mention}')
-            ctx.message.delete(tenManMessage[ctx.guild.id])
+            tenManMessage[ctx.guild.id].delete()
+            tenManMessage.pop(ctx.guild.id)
     @discord.ui.button(label='leave', style=discord.ButtonStyle.red)
     async def red_button(self, ctx:discord.Interaction, button:discord.ui.Button):
         logger.debug(f'red button pressed by {ctx.user.id}')

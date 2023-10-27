@@ -229,7 +229,6 @@ async def updateServer(ctx: discord.Interaction):
         await ctx.response.defer()
         serverPassword = await command_sender.updateServer(config['steamCMDInstallPath'], config['csgoServerInstallPath'], config['startCommand'], config['serverLoginUsername'], config['serverLoginPassword'])
         await ctx.followup.send('Server is updated and running.')
-        await ctx.channel.send(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 

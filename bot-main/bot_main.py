@@ -51,6 +51,7 @@ class TenMansButton(discord.ui.View):
         await ctx.response.edit_message(content = f'{len(tenManPlayers[ctx.guild.id])}/10 players joined', view=self)
         if len(tenManPlayers[ctx.guild.id]) == 10:
             logger.debug('Starting 10 mans')
+            sortedList = list()
             sortedList = await randomizeTeams(tenManPlayers[ctx.guild.id])
             await ctx.channel.send(f'Team 1: {sortedList[0].mention}, {sortedList[1].mention}, {sortedList[2].mention}, {sortedList[3].mention}, {sortedList[4].mention}\nTeam 2: {sortedList[5].mention}, {sortedList[6].mention}, {sortedList[7].mention}, {sortedList[8].mention}, {sortedList[9].mention}')
             tenManMessage[ctx.guild.id].delete()
@@ -73,7 +74,7 @@ async def randomizeTeams(unsortedSet):
         tempDiscordUser = sortList[swapidx]
         sortList[swapidx] = sortList[i]
         sortList[i] = tempDiscordUser
-    return randomizeTeams
+    return sortList
 
 # Checks if user has the role with a role ID as input
 async def checkIfUserHasRole(roles, roleID):

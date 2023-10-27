@@ -48,7 +48,7 @@ class TenMansButton(discord.ui.View):
         logger.debug(f'green button pressed by {ctx.user.id}')
         if ctx.user not in tenManPlayers[ctx.guild.id]:
             tenManPlayers[ctx.guild.id].add(ctx.user)
-        await ctx.response.edit_message(content = f'{len(tenManPlayers[ctx.guild.id])}/10 players joined', view=self)
+        await ctx.response.edit_message(content = await tenManStatus(ctx), view=self)
         if len(tenManPlayers[ctx.guild.id]) == 10:
             logger.debug('Starting 10 mans')
             sortedList = list()
@@ -61,7 +61,17 @@ class TenMansButton(discord.ui.View):
         logger.debug(f'red button pressed by {ctx.user.id}')
         if ctx.user in tenManPlayers[ctx.guild.id]:
             tenManPlayers[ctx.guild.id].remove(ctx.user)
-        await ctx.response.edit_message(content = f'{len(tenManPlayers[ctx.guild.id])}/10 players joined', view=self)
+        await ctx.response.edit_message(content = await tenManStatus(ctx), view=self)
+
+# Make message to send for 10 man status
+async def tenManStatus(ctx):
+    message = f'{len(tenManPlayers[ctx.guild.id])}/10 players joined:'
+    for player in tenManPlayers[ctx.guild.id]:
+        if player.nick is not None:
+            message += f"\n{player.nick}"
+        else:
+            message += f"\n{player.name}"
+    return message
 
 # Randomize teams for 10 mans
 async def randomizeTeams(unsortedSet):

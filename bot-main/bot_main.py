@@ -1,6 +1,5 @@
 import discord
 from discord import app_commands
-from discord.ext import commands
 import config_loader
 import command_sender
 import asyncio
@@ -18,6 +17,7 @@ config = config_loader.loadYaml()
 gamemode = 'nade-practice'
 tenManPlayers = dict()
 tenManMessage = dict()
+sortedList = dict()
 ip = get('https://api.ipify.org').content.decode('utf8')
 if '-port' in config['startCommand']:
     portStr = config['startCommand'][config['startCommand'].find('-port')+6:]
@@ -51,9 +51,9 @@ class TenMansButton(discord.ui.View):
         await ctx.response.edit_message(content = await tenManStatus(ctx), view=self)
         if len(tenManPlayers[ctx.guild.id]) == 10:
             logger.debug('Starting 10 mans')
-            sortedList = list()
-            sortedList = await randomizeTeams(tenManPlayers[ctx.guild.id])
-            await ctx.channel.send(f'Team 1: {sortedList[0].mention}, {sortedList[1].mention}, {sortedList[2].mention}, {sortedList[3].mention}, {sortedList[4].mention}\nTeam 2: {sortedList[5].mention}, {sortedList[6].mention}, {sortedList[7].mention}, {sortedList[8].mention}, {sortedList[9].mention}')
+            sortedList[ctx.guild.id].clear()
+            sortedList[ctx.guild.id] = await randomizeTeams(tenManPlayers[ctx.guild.id])
+            await ctx.channel.send(f'Team 1: {sortedList[ctx.guild.id][0].mention}, {sortedList[ctx.guild.id][1].mention}, {sortedList[ctx.guild.id][2].mention}, {sortedList[ctx.guild.id][3].mention}, {sortedList[ctx.guild.id][4].mention}\nTeam 2: {sortedList[ctx.guild.id][5].mention}, {sortedList[ctx.guild.id][6].mention}, {sortedList[ctx.guild.id][7].mention}, {sortedList[ctx.guild.id][8].mention}, {sortedList[ctx.guild.id][9].mention}')
             tenManMessage[ctx.guild.id].delete()
             tenManMessage.pop(ctx.guild.id)
     @discord.ui.button(label='leave', style=discord.ButtonStyle.red)
@@ -67,8 +67,8 @@ class TenMansButton(discord.ui.View):
 async def tenManStatus(ctx):
     message = f'{len(tenManPlayers[ctx.guild.id])}/10 players joined:'
     for player in tenManPlayers[ctx.guild.id]:
-        if player.nick is not None:
-            message += f"\n{player.nick}"
+        if player.display_name is not None:
+            message += f"\n{player.display_name}"
         else:
             message += f"\n{player.name}"
     return message
@@ -93,10 +93,16 @@ async def checkIfUserHasRole(roles, roleID):
             return True
     return False
 
+# Re-scramble teams using players who have already readied up.
+async def rescrambleTenMans(ctx):
+    sortedList[ctx.guild.id] = await randomizeTeams(sortedList)
+    await ctx.channel.send(f'New Teams:\nTeam 1: {sortedList[ctx.guild.id][0].mention}, {sortedList[ctx.guild.id][1].mention}, {sortedList[ctx.guild.id][2].mention}, {sortedList[ctx.guild.id][3].mention}, {sortedList[ctx.guild.id][4].mention}\nTeam 2: {sortedList[ctx.guild.id][5].mention}, {sortedList[ctx.guild.id][6].mention}, {sortedList[ctx.guild.id][7].mention}, {sortedList[ctx.guild.id][8].mention}, {sortedList[ctx.guild.id][9].mention}')
+
 # Ten mans discord command
 @tree.command(name='ten-mans', description='start 10 mans')
 @app_commands.choices(option=[app_commands.Choice(name='start', value='start'),
-                      app_commands.Choice(name='cancel', value='cancel')])
+                      app_commands.Choice(name='cancel', value='cancel'),
+                      app_commands.Choice(name='re-scramble', value='re-scramble')])
 async def tenMans(ctx: discord.Interaction, option:app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called ten-mans command with option {option.name}')
     if option.name == 'start':
@@ -114,6 +120,12 @@ async def tenMans(ctx: discord.Interaction, option:app_commands.Choice[str]):
             tenManMessage.pop(ctx.guild.id)
         else:
             await ctx.response.send_message('No 10 mans running', delete_after=30)
+    elif option.name == 're-scramble':
+        if ctx.guild.id in sortedList:
+            await ctx.response.send_message(f'Re-scrambling Teams')
+            await rescrambleTenMans(ctx)
+        else:
+            await ctx.response.send_message('Teams have not been set in this server') 
 
 # Start server command
 @tree.command(name='start-server', description='send command to server to start')

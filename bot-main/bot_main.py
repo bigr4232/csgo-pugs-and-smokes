@@ -179,7 +179,7 @@ async def serverGameModeCommand(ctx: discord.Interaction, option:app_commands.Ch
 @app_commands.choices(option=[app_commands.Choice(name='ancient', value='ancient'),
                               app_commands.Choice(name='anubis', value='anubis'),
                               app_commands.Choice(name='dust2', value='dust2'),
-                              app_commands.Choice(name='inferno', value='infero'),
+                              app_commands.Choice(name='inferno', value='inferno'),
                               app_commands.Choice(name='mirage', value='mirage'),
                               app_commands.Choice(name='nuke', value='nuke'),
                               app_commands.Choice(name='overpass', value='overpass'),

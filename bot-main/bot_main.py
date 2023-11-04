@@ -33,7 +33,6 @@ for arg in sys.argv:
     if arg == '-sim10man':
         simTenMan = True
 
-
 logger = logging.getLogger('logs')
 logger.setLevel(logging.INFO)
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')

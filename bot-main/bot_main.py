@@ -6,6 +6,8 @@ import asyncio
 from requests import get
 import logging
 import random
+import sys
+from tenManSim import fillTenMan
 
 # Intents and tree inits
 intents = discord.Intents.default()
@@ -18,6 +20,7 @@ gamemode = 'nade-practice'
 tenManPlayers = dict()
 tenManMessage = dict()
 sortedList = dict()
+simTenMan = False
 ip = get('https://api.ipify.org').content.decode('utf8')
 if '-port' in config['startCommand']:
     portStr = config['startCommand'][config['startCommand'].find('-port')+6:]
@@ -25,6 +28,11 @@ if '-port' in config['startCommand']:
 else:
     port = '27015'
 serverPassword = ''
+
+for arg in sys.argv:
+    if arg == '-sim10man':
+        simTenMan = True
+
 
 logger = logging.getLogger('logs')
 logger.setLevel(logging.INFO)
@@ -46,15 +54,19 @@ class TenMansButton(discord.ui.View):
     @discord.ui.button(label='Join',style=discord.ButtonStyle.green)
     async def green_button(self, ctx:discord.Interaction, button:discord.ui.Button):
         logger.debug(f'green button pressed by {ctx.user.id}')
-        if ctx.user not in tenManPlayers[ctx.guild.id]:
+        checkDup = ctx.user not in tenManPlayers[ctx.guild.id]
+        if simTenMan:
+            tenManPlayers[ctx.guild.id] = await fillTenMan(client, config)
+        if checkDup:
             tenManPlayers[ctx.guild.id].add(ctx.user)
         await ctx.response.edit_message(content = await tenManStatus(ctx), view=self)
-        if len(tenManPlayers[ctx.guild.id]) == 10:
+        if len(tenManPlayers[ctx.guild.id]) == 10 and checkDup:
             logger.debug('Starting 10 mans')
-            sortedList[ctx.guild.id].clear()
+            if ctx.guild.id in sortedList:
+                sortedList[ctx.guild.id].clear()
             sortedList[ctx.guild.id] = await randomizeTeams(tenManPlayers[ctx.guild.id])
             await ctx.channel.send(f'Team 1: {sortedList[ctx.guild.id][0].mention}, {sortedList[ctx.guild.id][1].mention}, {sortedList[ctx.guild.id][2].mention}, {sortedList[ctx.guild.id][3].mention}, {sortedList[ctx.guild.id][4].mention}\nTeam 2: {sortedList[ctx.guild.id][5].mention}, {sortedList[ctx.guild.id][6].mention}, {sortedList[ctx.guild.id][7].mention}, {sortedList[ctx.guild.id][8].mention}, {sortedList[ctx.guild.id][9].mention}')
-            tenManMessage[ctx.guild.id].delete()
+            await tenManMessage[ctx.guild.id].delete()
             tenManMessage.pop(ctx.guild.id)
     @discord.ui.button(label='leave', style=discord.ButtonStyle.red)
     async def red_button(self, ctx:discord.Interaction, button:discord.ui.Button):
@@ -95,7 +107,7 @@ async def checkIfUserHasRole(roles, roleID):
 
 # Re-scramble teams using players who have already readied up.
 async def rescrambleTenMans(ctx):
-    sortedList[ctx.guild.id] = await randomizeTeams(sortedList)
+    sortedList[ctx.guild.id] = await randomizeTeams(sortedList[ctx.guild.id])
     await ctx.channel.send(f'New Teams:\nTeam 1: {sortedList[ctx.guild.id][0].mention}, {sortedList[ctx.guild.id][1].mention}, {sortedList[ctx.guild.id][2].mention}, {sortedList[ctx.guild.id][3].mention}, {sortedList[ctx.guild.id][4].mention}\nTeam 2: {sortedList[ctx.guild.id][5].mention}, {sortedList[ctx.guild.id][6].mention}, {sortedList[ctx.guild.id][7].mention}, {sortedList[ctx.guild.id][8].mention}, {sortedList[ctx.guild.id][9].mention}')
 
 # Ten mans discord command
@@ -247,7 +259,7 @@ async def updateServer(ctx: discord.Interaction):
 # Initialization
 @client.event
 async def on_ready():
-    await tree.sync()
+    #await tree.sync()
     logger.info("connected")
 
 client.run(config['discordBotToken'])

@@ -256,7 +256,7 @@ async def updateServer(ctx: discord.Interaction):
 # Initialization
 @client.event
 async def on_ready():
-    #await tree.sync()
+    await tree.sync()
     logger.info("connected")
 
 client.run(config['discordBotToken'])

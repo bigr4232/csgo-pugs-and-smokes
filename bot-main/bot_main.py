@@ -227,9 +227,7 @@ async def sendServerCommand(ctx: discord.Interaction, command: str):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message(f'Sending command to server {command}', delete_after=30)
-        resp = await command_sender.sendCMD(command)
-        if resp != '':
-            await ctx.channel.send(f'Server responded with {resp}')
+        await command_sender.sendCMD(command)
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 

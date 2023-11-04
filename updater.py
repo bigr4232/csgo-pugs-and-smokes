@@ -31,6 +31,7 @@ def updateFiles(dst):
         os.makedirs(botPath)
     shutil.copy(os.path.abspath('bot-main/bot_main.py'), os.path.join(botPath, 'bot_main.py'))
     shutil.copy(os.path.abspath('bot-main/command_sender.py'), os.path.join(botPath, 'command_sender.py'))
+    shutil.copy(os.path.abspath('bot-main/tenManSim.py'), os.path.join(botPath, 'tenManSim.py'))
     shutil.copy('bot-main/config_loader.py', os.path.join(botPath, 'config_loader.py'))
     shutil.copy('requirements.txt', os.path.join(dst, 'requirements.txt'))
     if not os.path.exists(dst + '/config.yaml'):

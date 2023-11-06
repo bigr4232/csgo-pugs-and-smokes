@@ -37,14 +37,15 @@ logger = logging.getLogger('logs')
 logger.setLevel(logging.INFO)
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
-# TODO discord.py api needs support for steam:// implementation for the button to work
+# TODO Implement this connect to server button in a convenient way
+# Discord api blocks steam links
 # This will be implemented in the get-server-info commands
 # Class for connect to server button
 class ButtonForServer(discord.ui.View):
     def __init__(self):
         super().__init__()
-        url = f'steam://connect/{ip}:{port}/{serverPassword}'
-        self.add_item(discord.ui.Button(label='Connect', url=url))
+        url = f'https://cs-pho.bigr.dev'
+        self.add_item(discord.ui.Button(label='Connect', url=url, style=discord.ButtonStyle.green))
 
 # Class for 10 mans buttons
 class TenMansButton(discord.ui.View):
@@ -235,7 +236,7 @@ async def sendServerCommand(ctx: discord.Interaction, command: str):
 async def getServerInfo(ctx: discord.Interaction):
     logger.info(f'{ctx.user.name} called server command get-server-info')
     serverPassword = await command_sender.getPassword()
-    await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024')
+    await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', view=ButtonForServer())
 
 @tree.command(name='update-server', description='Update cs2 server if there is an update available')
 async def updateServer(ctx: discord.Interaction):

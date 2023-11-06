@@ -37,6 +37,9 @@ def updateFiles(dst):
     if not os.path.exists(dst + '/config.yaml'):
         updateYaml()
         shutil.copy('config.yaml', os.path.join(dst, 'config.yaml'))
+    if not os.path.exists(dst + '/bot-main/accounts.yaml'):
+        updateYaml()
+        shutil.copy('bot-main/accounts.yaml', os.path.join(dst, 'accounts.yaml'))
 
 def main():
     logger.info('Updating files to version in this folder')

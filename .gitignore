@@ -161,5 +161,4 @@ cython_debug/
 
 bot-main/clearcommands.py
 bot-main/test.py
-bot-main/accounts.yaml
 launch.json

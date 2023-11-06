@@ -9,7 +9,7 @@ import random
 import sys
 from tenManSim import fillTenMan
 
-# Intents and tree inits
+# Intents, tree inits, globals
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
@@ -29,17 +29,16 @@ else:
     port = '27015'
 serverPassword = ''
 
+# get args
 for arg in sys.argv:
     if arg == '-sim10man':
         simTenMan = True
 
+# Logging
 logger = logging.getLogger('logs')
 logger.setLevel(logging.INFO)
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
-# TODO Implement this connect to server button in a convenient way
-# Discord api blocks steam links
-# This will be implemented in the get-server-info commands
 # Class for connect to server button
 class ButtonForServer(discord.ui.View):
     def __init__(self):

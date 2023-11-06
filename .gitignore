@@ -162,3 +162,5 @@ cython_debug/
 bot-main/clearcommands.py
 bot-main/test.py
 launch.json
+bot-main/test_pytest.py
+settings.json

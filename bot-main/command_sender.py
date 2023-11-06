@@ -20,6 +20,27 @@ async def getServerOutput(command):
             return line[14:line.find('\n')]
     return ''
 
+# Get number of players in the server
+async def getNumPlayers():
+    cmd = await initCommand('status')
+    subprocess.run(cmd)
+    await asyncio.sleep(.5)
+    path = os. getcwd() + '/output.txt'
+    subprocess.run(['screen', '-r', 'csgoServer', '-p0', '-X', 'hardcopy', path])
+    with open('output.txt') as f:
+        lines = f.readlines()
+    subprocess.run(['rm', 'output.txt'])
+    count = False
+    numPlayers = 0
+    for line in reversed(lines):
+        if line == '#end\n':
+            count = True
+        elif line == '  id     time ping loss      state   rate adr name\n':
+            break
+        elif count and line[0:5] != '65535':
+            numPlayers += 1
+    return numPlayers
+
 # Send terminal command to start server
 async def startServer(startCommand):
     subprocess.run(['screen', '-dmS', 'csgoServer'])

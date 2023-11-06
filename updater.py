@@ -38,7 +38,6 @@ def updateFiles(dst):
         updateYaml()
         shutil.copy('config.yaml', os.path.join(dst, 'config.yaml'))
     if not os.path.exists(dst + '/bot-main/accounts.yaml'):
-        updateYaml()
         shutil.copy('bot-main/accounts.yaml', os.path.join(dst, 'accounts.yaml'))
 
 def main():

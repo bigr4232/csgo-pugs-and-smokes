@@ -20,6 +20,16 @@ async def getServerOutput(command):
             return line[14:line.find('\n')]
     return ''
 
+# Check if player is a bot
+async def isBot(line):
+    for char in line:
+        if char.isalpha():
+            if char == 'B':
+                return True
+            else:
+                return False
+
+
 # Get number of players in the server
 async def getNumPlayers():
     cmd = await initCommand('status')
@@ -37,7 +47,7 @@ async def getNumPlayers():
             count = True
         elif line == '  id     time ping loss      state   rate adr name\n':
             break
-        elif count and line[0:5] != '65535':
+        elif count and line[0:5] != '65535' and not await isBot(line):
             numPlayers += 1
     return numPlayers
 

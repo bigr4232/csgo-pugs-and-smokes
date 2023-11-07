@@ -21,7 +21,6 @@ tenManPlayers = dict()
 tenManMessage = dict()
 sortedList = dict()
 simTenMan = False
-ip = get('https://api.ipify.org').content.decode('utf8')
 if '-port' in config['startCommand']:
     portStr = config['startCommand'][config['startCommand'].find('-port')+6:]
     port = portStr[0:portStr.find(' ')]
@@ -73,6 +72,10 @@ class TenMansButton(discord.ui.View):
         if ctx.user in tenManPlayers[ctx.guild.id]:
             tenManPlayers[ctx.guild.id].remove(ctx.user)
         await ctx.response.edit_message(content = await tenManStatus(ctx), view=self)
+
+# Get IP
+async def getIP():
+    return get('https://api.ipify.org').content.decode('utf8')
 
 # Make message to send for 10 man status
 async def tenManStatus(ctx):
@@ -235,6 +238,7 @@ async def sendServerCommand(ctx: discord.Interaction, command: str):
 async def getServerInfo(ctx: discord.Interaction):
     logger.info(f'{ctx.user.name} called server command get-server-info')
     serverPassword = await command_sender.getPassword()
+    ip = await getIP()
     await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', view=ButtonForServer())
 
 @tree.command(name='update-server', description='Update cs2 server if there is an update available')

@@ -4,7 +4,9 @@ import asyncio
 import subprocess
 import os
 import logging
+import sys
 
+# Globals
 content = config_loader.loadYaml()
 HOST = '0.0.0.0'
 PORT = int(content['PORT'])
@@ -14,9 +16,18 @@ if '-port' in content['startCommand']:
 else:
     csServerPort = '27015'
 
+# Get input args
+debugMode = False
+for arg in sys.argv:
+    if arg == '-d':
+        debugMode = True
+
 # Logging
 logger = logging.getLogger('logs')
-logger.setLevel(logging.INFO)
+if debugMode:
+    logger.setLevel(logging.DEBUG)
+else:
+    logger.setLevel(logging.INFO)
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 # Initalize a command
@@ -136,12 +147,16 @@ async def startServer():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((HOST, PORT))
         s.listen()
+        logger.debug('Listening')
         while True:
             conn, addr = s.accept()
             data = conn.recv(1024)
-            returnVal = await parseCommand(data.decode('utf8'))
+            receivedVal = data.decode('utf8')
+            logger.debug(f'Received packet {receivedVal}')
+            returnVal = await parseCommand(receivedVal)
             if not data:
                 break
+            logger.debug(f'Sending packet {returnVal}')
             conn.sendall(returnVal.encode('utf8'))
             conn.close
 
@@ -153,7 +168,7 @@ async def main():
     except:
         logger.info('Server connection failed, retrying in 60 seconds')
         await asyncio.sleep(60)
-        asyncio.run(main)
+        await main()
 
 if __name__ == "__main__":
     asyncio.run(main)

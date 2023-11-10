@@ -236,6 +236,7 @@ async def getServerInfo(ctx: discord.Interaction):
     ip = await getIP()
     await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', view=ButtonForServer())
 
+# Command to update server
 @tree.command(name='update-server', description='Update cs2 server if there is an update available')
 async def updateServer(ctx: discord.Interaction):
     logger.info(f'{ctx.user.name} called server command update-server')

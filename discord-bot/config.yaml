@@ -3,8 +3,5 @@ discordChannel:
 discordAdminRole:
 discordGuildID:
 discordOwnerID:
-startCommand:
-csgoServerInstallPath:
-steamCMDInstallPath:
-serverLoginUsername:
-serverLoginPassword:
+HOST:
+PORT:

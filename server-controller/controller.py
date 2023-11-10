@@ -20,14 +20,14 @@ logger.setLevel(logging.INFO)
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 # Initalize a command
-def initCommand(inputCommand):
+async def initCommand(inputCommand):
     inputCommand = inputCommand + '^M'
     command = ['screen', '-S', 'csgoServer', '-p0', '-X', 'stuff', inputCommand]
     return command
 
 # Get output of server, finds value of command passed into function
-def getServerOutput(command):
-    asyncio.sleep(.5)
+async def getServerOutput(command):
+    await asyncio.sleep(.5)
     path = os. getcwd() + '/output.txt'
     subprocess.run(['screen', '-r', 'csgoServer', '-p0', '-X', 'hardcopy', path])
     with open('output.txt') as f:
@@ -39,7 +39,7 @@ def getServerOutput(command):
     return ''
 
 # Check if player is a bot
-def isBot(line):
+async def isBot(line):
     for char in line:
         if char.isalpha():
             if char == 'B':
@@ -48,10 +48,10 @@ def isBot(line):
                 return False
 
 # Get number of players in the server
-def getNumPlayers():
-    cmd = initCommand('status')
+async def getNumPlayers():
+    cmd = await initCommand('status')
     subprocess.run(cmd)
-    asyncio.sleep(.5)
+    await asyncio.sleep(.5)
     path = os. getcwd() + '/output.txt'
     subprocess.run(['screen', '-r', 'csgoServer', '-p0', '-X', 'hardcopy', path])
     with open('output.txt') as f:
@@ -64,74 +64,74 @@ def getNumPlayers():
             count = True
         elif line == '  id     time ping loss      state   rate adr name\n':
             break
-        elif count and line[0:5] != '65535' and not isBot(line):
+        elif count and line[0:5] != '65535' and not await isBot(line):
             numPlayers += 1
     return numPlayers
 
 
 # Send terminal command to start server
-def startServer(startCommand):
+async def startServer(startCommand):
     subprocess.run(['screen', '-dmS', 'csgoServer'])
-    cmd = initCommand(startCommand)
+    cmd = await initCommand(startCommand)
     subprocess.run(cmd)
-    asyncio.sleep(6)
+    await asyncio.sleep(6)
 
 # Send terminal command to stop server
-def stopServer():
+async def stopServer():
     subprocess.run(['screen', '-S', 'csgoServer', '-X', 'quit'])
 
 # Send command to server
-def sendCMD(command):
-    cmd = initCommand(command)
+async def sendCMD(command):
+    cmd = await initCommand(command)
     subprocess.run(cmd)
 
 # Get server password
-def getPassword():
+async def getPassword():
     cmd = initCommand('sv_password')
     subprocess.run(cmd)
-    response = getServerOutput('sv_password')
+    response = await getServerOutput('sv_password')
     return response
 
 # Update server
-def updateServer(steamCMDpath, csgoServerPath, startCommand, username, password):
-    stopServer()
+async def updateServer(steamCMDpath, csgoServerPath, startCommand, username, password):
+    await stopServer()
     cmd = f'{steamCMDpath} +force_install_dir {csgoServerPath} +login {username} {password} +app_update 730 +quit'
     subprocess.run(cmd, shell=True)
-    startServer(startCommand)
+    await startServer(startCommand)
 
 # Get server password
-def getPassword():
-    cmd = initCommand('sv_password')
+async def getPassword():
+    cmd = await initCommand('sv_password')
     subprocess.run(cmd)
-    response = getServerOutput('sv_password')
+    response = await getServerOutput('sv_password')
     return response
 
 # Parse command sent
 # Returns string or '' for value not needed on return
-def parseCommand(cmd):
+async def parseCommand(cmd):
     returnVal = ''
     if cmd[0] == '-':
         if cmd[1:] == 'start-server':
-            startServer(content['StartCommand'])
+            await startServer(content['StartCommand'])
         elif cmd[1:] == 'stop-server':
-            stopServer()
+            await stopServer()
         elif cmd[1:] == 'restart-server':
-            stopServer()
-            asyncio.sleep(1)
-            startServer(content['StartCommand'])
+            await stopServer()
+            await asyncio.sleep(1)
+            await startServer(content['StartCommand'])
         elif cmd[1:] == 'update-server':
-            updateServer(content['steamCMDInstallPath'], os.getcwd() + 'game/bin/linuxsteamrt64/cs2', content['StartCommand'], content['serverLoginUsername'], content['serverLoginPassword'])
+            await updateServer(content['steamCMDInstallPath'], os.getcwd() + 'game/bin/linuxsteamrt64/cs2', content['StartCommand'], content['serverLoginUsername'], content['serverLoginPassword'])
         elif cmd[1:] == 'get-password':
-            returnVal = getPassword()
+            returnVal = await getPassword()
         elif cmd[1:] == 'get-port':
             returnVal = csServerPort
     else:
-        sendCMD()
+        await sendCMD()
     return returnVal
 
 
 # Start socket server
-def startServer():
+async def startServer():
     logger.info('Successfully connected')
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((HOST, PORT))
@@ -139,21 +139,21 @@ def startServer():
         while True:
             conn, addr = s.accept()
             data = conn.recv(1024)
-            returnVal = parseCommand(data.decode('utf8'))
+            returnVal = await parseCommand(data.decode('utf8'))
             if not data:
                 break
             conn.sendall(returnVal.encode('utf8'))
             conn.close
 
 # Start server socket. If error, wait 60 seconds and retry
-def main():
+async def main():
     try:
         logger.info('Attempting server connection')
-        startServer()
+        await startServer()
     except:
         logger.info('Server connection failed, retrying in 60 seconds')
-        asyncio.sleep(60)
-        main()
+        await asyncio.sleep(60)
+        asyncio.run(main)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main)

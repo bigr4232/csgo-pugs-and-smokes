@@ -1,6 +1,3 @@
-import subprocess
-import asyncio
-import os
 import socket
 
 # Send command to execute certain gamemode

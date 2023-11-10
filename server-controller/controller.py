@@ -8,6 +8,11 @@ import logging
 content = config_loader.loadYaml()
 HOST = '0.0.0.0'
 PORT = int(content['PORT'])
+if '-port' in content['startCommand']:
+    portStr = content['startCommand'][content['startCommand'].find('-port')+6:]
+    csServerPort = portStr[0:portStr.find(' ')]
+else:
+    csServerPort = '27015'
 
 # Logging
 logger = logging.getLogger('logs')
@@ -94,6 +99,13 @@ def updateServer(steamCMDpath, csgoServerPath, startCommand, username, password)
     subprocess.run(cmd, shell=True)
     startServer(startCommand)
 
+# Get server password
+def getPassword():
+    cmd = initCommand('sv_password')
+    subprocess.run(cmd)
+    response = getServerOutput('sv_password')
+    return response
+
 # Parse command sent
 # Returns string or '' for value not needed on return
 def parseCommand(cmd):
@@ -103,12 +115,16 @@ def parseCommand(cmd):
             startServer(content['StartCommand'])
         elif cmd[1:] == 'stop-server':
             stopServer()
-        elif cmd[2:] == 'restart-server':
+        elif cmd[1:] == 'restart-server':
             stopServer()
             asyncio.sleep(1)
             startServer(content['StartCommand'])
         elif cmd[1:] == 'update-server':
             updateServer(content['steamCMDInstallPath'], os.getcwd() + 'game/bin/linuxsteamrt64/cs2', content['StartCommand'], content['serverLoginUsername'], content['serverLoginPassword'])
+        elif cmd[1:] == 'get-password':
+            returnVal = getPassword()
+        elif cmd[1:] == 'get-port':
+            returnVal = csServerPort
     else:
         sendCMD()
     return returnVal
@@ -123,10 +139,10 @@ def startServer():
         while True:
             conn, addr = s.accept()
             data = conn.recv(1024)
-            returnVal = parseCommand(data.decode('UTF-8'))
+            returnVal = parseCommand(data.decode('utf8'))
             if not data:
                 break
-            conn.sendall(returnVal.encode('UTF-8'))
+            conn.sendall(returnVal.encode('utf8'))
             conn.close
 
 # Start server socket. If error, wait 60 seconds and retry

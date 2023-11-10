@@ -3,7 +3,7 @@ import socket
 # Send command to execute certain gamemode
 async def gamemodeStart(gamemode, HOST, PORT):
     if gamemode == 'nade-practice':
-        cmd = await sendCMD('exec nadeprac', HOST, PORT)
+        await sendCMD('exec nadeprac', HOST, PORT)
 
 # Send changelevel command to server
 async def changemap(map, HOST, PORT):

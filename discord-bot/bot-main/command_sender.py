@@ -1,97 +1,33 @@
 import subprocess
 import asyncio
 import os
-
-# Initalize a command
-async def initCommand(inputCommand):
-    inputCommand = inputCommand + '^M'
-    command = ['screen', '-S', 'csgoServer', '-p0', '-X', 'stuff', inputCommand]
-    return command
-
-async def getServerOutput(command):
-    await asyncio.sleep(.5)
-    path = os. getcwd() + '/output.txt'
-    subprocess.run(['screen', '-r', 'csgoServer', '-p0', '-X', 'hardcopy', path])
-    with open('output.txt') as f:
-        lines = f.readlines()
-    subprocess.run(['rm', 'output.txt'])
-    for line in reversed(lines):
-        if command+' = ' in line:
-            return line[14:line.find('\n')]
-    return ''
-
-# Check if player is a bot
-async def isBot(line):
-    for char in line:
-        if char.isalpha():
-            if char == 'B':
-                return True
-            else:
-                return False
-
-
-# Get number of players in the server
-async def getNumPlayers():
-    cmd = await initCommand('status')
-    subprocess.run(cmd)
-    await asyncio.sleep(.5)
-    path = os. getcwd() + '/output.txt'
-    subprocess.run(['screen', '-r', 'csgoServer', '-p0', '-X', 'hardcopy', path])
-    with open('output.txt') as f:
-        lines = f.readlines()
-    subprocess.run(['rm', 'output.txt'])
-    count = False
-    numPlayers = 0
-    for line in reversed(lines):
-        if line == '#end\n':
-            count = True
-        elif line == '  id     time ping loss      state   rate adr name\n':
-            break
-        elif count and line[0:5] != '65535' and not await isBot(line):
-            numPlayers += 1
-    return numPlayers
-
-# Send terminal command to start server
-async def startServer(startCommand):
-    subprocess.run(['screen', '-dmS', 'csgoServer'])
-    cmd = await initCommand(startCommand)
-    subprocess.run(cmd)
-    await asyncio.sleep(6)
-    return await getPassword()
-
-
-# Send terminal command to stop server
-async def stopServer():
-    subprocess.run(['screen', '-S', 'csgoServer', '-X', 'quit'])
+import socket
 
 # Send command to execute certain gamemode
-async def gamemodeStart(gamemode):
+async def gamemodeStart(gamemode, HOST, PORT):
     if gamemode == 'nade-practice':
-        cmd = await initCommand('exec nadeprac')
-    subprocess.run(cmd)
+        cmd = await sendCMD('exec nadeprac', HOST, PORT)
 
 # Send changelevel command to server
-async def changemap(map):
-    cmd = await initCommand(f'changelevel de_{map}')
-    subprocess.run(cmd)
-
-# Send command to server and return response
-async def sendCMD(command):
-    cmd = await initCommand(command)
-    response = subprocess.run(cmd, capture_output=True)
-    return response
+async def changemap(map, HOST, PORT):
+    cmd = (f'changelevel de_{map}')
+    await sendCMD(cmd, HOST, PORT)
 
 # Get server password
-async def getPassword():
-    cmd = await initCommand('sv_password')
-    subprocess.run(cmd)
-    response = await getServerOutput('sv_password')
+async def getPassword(HOST, PORT):
+    response = await sendCMD('-get-password', HOST, PORT)
     return response
 
-# Update server
-async def updateServer(steamCMDpath, csgoServerPath, startCommand, username, password):
-    await stopServer()
-    cmd = f'{steamCMDpath} +force_install_dir {csgoServerPath} +login {username} {password} +app_update 730 +quit'
-    subprocess.run(cmd, shell=True)
-    return await startServer(startCommand)
+# Get server port
+async def getServerPort(HOST, PORT):
+    response = await sendCMD('-get-port', HOST, PORT)
+    return response
 
+# Send packet to server
+async def sendCMD(cmd, HOST, PORT):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        cmd = cmd.encode('utf8')
+        s.connect((HOST, PORT))
+        s.sendall(cmd)
+        returnVal = s.recv(1024)
+        return returnVal.decode('utf8')

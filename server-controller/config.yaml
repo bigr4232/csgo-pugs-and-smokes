@@ -1,6 +1,5 @@
-HOST:
 PORT:
-StartCommand:
+startCommand:
 steamCMDInstallPath:
 serverLoginUsername:
 serverLoginPassword:

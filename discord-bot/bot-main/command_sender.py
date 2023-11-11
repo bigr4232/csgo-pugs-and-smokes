@@ -23,6 +23,8 @@ async def getServerPort(HOST, PORT):
 # Send packet to server
 async def sendCMD(cmd, HOST, PORT):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        if cmd != '-update-server':
+            s.settimeout(20)
         cmd = cmd.encode('utf8')
         s.connect((HOST, PORT))
         s.sendall(cmd)

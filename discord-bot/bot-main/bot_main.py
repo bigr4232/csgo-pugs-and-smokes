@@ -180,7 +180,7 @@ async def restartServerCommand(ctx: discord.Interaction):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Restarting Counter Strike server.', delete_after=30)
-        await command_sender.sendCMD['-restart-server', config['HOST'], config['PORT']]
+        await command_sender.sendCMD('-restart-server', config['HOST'], config['PORT'])
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
@@ -231,7 +231,7 @@ async def sendServerCommand(ctx: discord.Interaction, command: str):
 @tree.command(name='get-server-info', description='Get info to connect to cs server')
 async def getServerInfo(ctx: discord.Interaction):
     logger.info(f'{ctx.user.name} called server command get-server-info')
-    serverPassword = await command_sender.getPassword()
+    serverPassword = await command_sender.getPassword(config['HOST'], config['PORT'])
     port = await command_sender.getServerPort(config['HOST'], config['PORT'])
     ip = await getIP()
     await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', view=ButtonForServer())

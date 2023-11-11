@@ -19,6 +19,8 @@ def updateYaml():
 def updateFiles(dst):
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
     dst = os.path.join(ROOT_DIR, dst)
+    if not os.path.exists(dst):
+        os.makedirs(dst)
     shutil.copy('config_loader.py', os.path.join(dst, 'config_loader.py'))
     shutil.copy('controller.py', os.path.join(dst, 'controller.py'))
     shutil.copy('requirements.txt', os.path.join(dst, 'requirements.txt'))

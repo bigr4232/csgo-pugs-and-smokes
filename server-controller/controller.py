@@ -10,6 +10,7 @@ import sys
 content = config_loader.loadYaml()
 HOST = '0.0.0.0'
 PORT = int(content['PORT'])
+csServerPath = content['startCommand'][:content['startCommand'].find('/game')]
 if '-port' in content['startCommand']:
     portStr = content['startCommand'][content['startCommand'].find('-port')+6:]
     csServerPort = portStr[0:portStr.find(' ')]
@@ -30,6 +31,14 @@ else:
     logger.setLevel(logging.INFO)
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
+# Check if cs server is running
+async def serverRunning():
+    var = subprocess.check_output(["screen -ls; true"],shell=True)
+    if ".csgoServer\t(" in var.decode():
+        return True
+    else:
+        return False
+    
 # Initalize a command
 async def initCommand(inputCommand):
     inputCommand = inputCommand + '^M'
@@ -82,14 +91,16 @@ async def getNumPlayers():
 
 # Send terminal command to start server
 async def startServer(startCommand):
-    subprocess.run(['screen', '-dmS', 'csgoServer'])
-    cmd = await initCommand(startCommand)
-    subprocess.run(cmd)
-    await asyncio.sleep(6)
+    if not await serverRunning():
+        subprocess.run(['screen', '-dmS', 'csgoServer'])
+        cmd = await initCommand(startCommand)
+        subprocess.run(cmd)
+        await asyncio.sleep(6)
 
 # Send terminal command to stop server
 async def stopServer():
-    subprocess.run(['screen', '-S', 'csgoServer', '-X', 'quit'])
+    if await serverRunning():
+        subprocess.run(['screen', '-S', 'csgoServer', '-X', 'quit'])
 
 # Send command to server
 async def sendCMD(command):
@@ -120,54 +131,57 @@ async def getPassword():
 # Parse command sent
 # Returns string or '' for value not needed on return
 async def parseCommand(cmd):
-    returnVal = ''
+    returnVal = '-'
     if cmd[0] == '-':
         if cmd[1:] == 'start-server':
-            await startServer(content['StartCommand'])
+            await startServer(content['startCommand'])
         elif cmd[1:] == 'stop-server':
             await stopServer()
         elif cmd[1:] == 'restart-server':
             await stopServer()
             await asyncio.sleep(1)
-            await startServer(content['StartCommand'])
+            await startServer(content['startCommand'])
         elif cmd[1:] == 'update-server':
-            await updateServer(content['steamCMDInstallPath'], os.getcwd() + 'game/bin/linuxsteamrt64/cs2', content['StartCommand'], content['serverLoginUsername'], content['serverLoginPassword'])
+            await updateServer(content['steamCMDInstallPath'], csServerPath, content['startCommand'], content['serverLoginUsername'], content['serverLoginPassword'])
         elif cmd[1:] == 'get-password':
             returnVal = await getPassword()
         elif cmd[1:] == 'get-port':
             returnVal = csServerPort
     else:
-        await sendCMD()
+        await sendCMD(cmd)
     return returnVal
 
 
 # Start socket server
-async def startServer():
-    logger.info('Successfully connected')
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT))
-        s.listen()
-        logger.debug('Listening')
-        while True:
-            conn, addr = s.accept()
-            data = conn.recv(1024)
-            receivedVal = data.decode('utf8')
-            logger.debug(f'Received packet {receivedVal}')
-            returnVal = await parseCommand(receivedVal)
-            if not data:
-                break
-            logger.debug(f'Sending packet {returnVal}')
-            conn.sendall(returnVal.encode('utf8'))
-            conn.close
+async def startTCPServer(s):
+    while True:
+        conn, addr = s.accept()
+        data = conn.recv(1024)
+        receivedVal = data.decode('utf8')
+        logger.debug(f'Received packet {receivedVal}')
+        returnVal = await parseCommand(receivedVal)
+        if not data:
+            break
+        logger.debug(f'Sending packet {returnVal}')
+        conn.send(returnVal.encode('utf8'))
+        conn.close
 
 # Start server socket. If error, wait 60 seconds and retry
 async def main():
     try:
         logger.info('Attempting server connection')
-        await startServer()
-    except:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind((HOST, PORT))
+        s.listen()
+        logger.info('Successfully connected, Listening')
+        await startTCPServer(s)
+    except Exception as e:
+        logger.info(e)
         logger.info('Server connection failed, retrying in 60 seconds')
-        await asyncio.sleep(60)
+        s.shutdown(socket.SHUT_RDWR)
+        s.close()
+        await asyncio.sleep(10)
         await main()
 
 if __name__ == "__main__":

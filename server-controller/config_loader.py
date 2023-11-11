@@ -5,9 +5,8 @@ def loadYaml():
         content = yaml.safe_load(config)
     return content
 
-def setYaml(host, port, startcommand, steamcmdinstallpath, serverusername, serverpassword):
+def setYaml(port, startcommand, steamcmdinstallpath, serverusername, serverpassword):
     content = loadYaml()
-    content['HOST'] = host
     content['PORT'] = port
     content['startCommand'] = startcommand
     content['steamCMDInstallPath'] = steamcmdinstallpath

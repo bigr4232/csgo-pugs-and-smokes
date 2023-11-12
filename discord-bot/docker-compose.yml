@@ -3,7 +3,7 @@ version: '3.4'
 services:
   steamauthkeydiscordbot:
     image: cs-discord-bot
-    container_name: cd-discord-bot
+    container_name: cs-discord-bot
     build:
       context: .
       dockerfile: ./Dockerfile

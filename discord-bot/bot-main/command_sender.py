@@ -26,7 +26,7 @@ async def sendCMD(cmd, HOST, PORT):
         if cmd != '-update-server':
             s.settimeout(20)
         cmd = cmd.encode('utf8')
-        s.connect((HOST, PORT))
+        s.connect((HOST, int(PORT)))
         s.sendall(cmd)
         returnVal = s.recv(1024)
         return returnVal.decode('utf8')

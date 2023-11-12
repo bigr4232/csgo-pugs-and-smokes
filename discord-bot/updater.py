@@ -16,12 +16,9 @@ def updateYaml():
     discordguildid = input('Enter the id of the server/guild that the bot will be in: ')
     discordownerid = input('Enter the discord id of the bot owner for admin commands: ')
     discordadminrole = input('Enter the role id for the cs server admin role: ')
-    startcommand = input('Enter the start command to run the server: ')
-    csgoserverinstallpath = input('Enter the path to the server directory: ')
-    steamcmdinstallpath = input('Enter the path to the steamcmd directory: ')
-    serverusername = input('Enter the username of the account used to login and download the server: ')
-    serverpassword = input('Enter the password of the account used to login and download the server: ')
-    setYaml(discordbottoken, discordchannel, discordadminrole, discordguildid, discordownerid, startcommand, csgoserverinstallpath, steamcmdinstallpath, serverusername, serverpassword)
+    host = input('Enter the IP address for the server controller to connect to: ')
+    port = input('Enter the port the server controller is running on: ')
+    setYaml(discordbottoken, discordchannel, discordadminrole, discordguildid, discordownerid, host, port)
 
 def updateFiles(dst):
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))

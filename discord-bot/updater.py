@@ -34,6 +34,8 @@ def updateFiles(dst):
     shutil.copy(os.path.abspath('bot-main/tenManSim.py'), os.path.join(botPath, 'tenManSim.py'))
     shutil.copy('bot-main/config_loader.py', os.path.join(botPath, 'config_loader.py'))
     shutil.copy('requirements.txt', os.path.join(dst, 'requirements.txt'))
+    shutil.copy('docker-compose.yml', os.path.join(dst, 'docker-compose.yml'))
+    shutil.copy('Dockerfile', os.path.join(dst, 'Dockerfile'))
     if not os.path.exists(dst + '/config.yaml'):
         updateYaml()
         shutil.copy('config.yaml', os.path.join(dst, 'config.yaml'))

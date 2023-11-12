@@ -4,7 +4,8 @@ CS discord bot that controls servers and can be used to start 10 mans.
 
 ## Usage
 
-This is split into two different sections.
+This is split into two different sections. Readmes for each part are in the respective
+folders.
 
 discord-bot is the folder for the discord bot.
 

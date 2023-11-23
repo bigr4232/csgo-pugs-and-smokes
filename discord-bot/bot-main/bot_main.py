@@ -148,7 +148,7 @@ async def startServerCommand(ctx: discord.Interaction):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Starting Counter Strike server.', delete_after=30)
-        await command_sender.sendCMD('-start-server', config['HOST'], config['PORT'])
+        await command_sender.sendCMD('-start-server')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
@@ -164,7 +164,7 @@ async def stopServerCommand(ctx: discord.Interaction):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Stopping Counter Strike server.', delete_after=30)
-        await command_sender.sendCMD('-stop-server', config['HOST'], config['PORT'])
+        await command_sender.sendCMD('-stop-server')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
         
@@ -180,7 +180,7 @@ async def restartServerCommand(ctx: discord.Interaction):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Restarting Counter Strike server.', delete_after=30)
-        await command_sender.sendCMD('-restart-server', config['HOST'], config['PORT'])
+        await command_sender.sendCMD('-restart-server')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
@@ -192,7 +192,7 @@ async def serverGameModeCommand(ctx: discord.Interaction, option:app_commands.Ch
     await ctx.response.send_message(f'Switching server to gamemode {option.value}', delete_after=30)
     global gamemode
     gamemode = 'nade-practice'
-    await command_sender.gamemodeStart(option.value, config['HOST'], config['PORT'])
+    await command_sender.gamemodeStart(option.value)
 
 # Change map
 @tree.command(name='changemap', description='changemap to specified map')
@@ -207,9 +207,9 @@ async def serverGameModeCommand(ctx: discord.Interaction, option:app_commands.Ch
 async def changeMap(ctx: discord.Interaction, option:app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called server command changemap with option {option.name}')
     await ctx.response.send_message(f'Switching server to the map {option.value}', delete_after=30)
-    await command_sender.changemap(option.value, config['HOST'], config['PORT'])
+    await command_sender.changemap(option.value)
     await asyncio.sleep(10)
-    await command_sender.gamemodeStart(gamemode, config['HOST'], config['PORT'])
+    await command_sender.gamemodeStart(gamemode)
 
 # Send server command
 @tree.command(name='send-server-command', description='Send a command to the server')
@@ -223,7 +223,7 @@ async def sendServerCommand(ctx: discord.Interaction, command: str):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message(f'Sending command to server {command}', delete_after=30)
-        await command_sender.sendCMD(command, config['HOST'], config['PORT'])
+        await command_sender.sendCMD(command)
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
@@ -231,8 +231,8 @@ async def sendServerCommand(ctx: discord.Interaction, command: str):
 @tree.command(name='get-server-info', description='Get info to connect to cs server')
 async def getServerInfo(ctx: discord.Interaction):
     logger.info(f'{ctx.user.name} called server command get-server-info')
-    serverPassword = await command_sender.getPassword(config['HOST'], config['PORT'])
-    port = await command_sender.getServerPort(config['HOST'], config['PORT'])
+    serverPassword = await command_sender.getPassword()
+    port = await command_sender.getServerPort()
     ip = await getIP()
     await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', view=ButtonForServer())
 
@@ -248,7 +248,7 @@ async def updateServer(ctx: discord.Interaction):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.defer()
-        await command_sender.sendCMD('-update-server', config['HOST'], config['PORT'])
+        await command_sender.sendCMD('-update-server')
         await ctx.followup.send('Server is updated and running.')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
@@ -258,5 +258,6 @@ async def updateServer(ctx: discord.Interaction):
 async def on_ready():
     await tree.sync()
     logger.info("connected")
+    await command_sender.automatedUpdateServer()
 
 client.run(config['discordBotToken'])

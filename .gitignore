@@ -165,3 +165,4 @@ launch.json
 bot-main/test_pytest.py
 settings.json
 discord-bot/bot-main/test.py
+discord-bot/bot-main/clearcommands.py

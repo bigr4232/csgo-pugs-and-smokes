@@ -311,11 +311,11 @@ async def on_message(ctx):
         member = await guild.fetch_member(ctx.user.id)
         memberRoles = member.roles
     else:
-        memberRoles = ctx.user.roles
+        memberRoles = ctx.author.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         if ctx.content.startswith('!'):
             if ctx.content[1:] == 'version':
-                ctx.channel.send(f'Version: {__version__}')
+                await ctx.channel.send(f'Version: {__version__}')
 
 # Initialization
 @client.event

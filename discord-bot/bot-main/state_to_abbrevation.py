@@ -51,3 +51,7 @@ stateToAbbrev = {
     "Wyoming": "WY",
     "District of Columbia": "DC",
 }
+
+stateList = list()
+for state in stateToAbbrev.keys():
+    stateList.append(state.lower())

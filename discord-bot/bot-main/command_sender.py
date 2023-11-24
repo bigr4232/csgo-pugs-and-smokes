@@ -1,12 +1,8 @@
 import socket
 from datetime import datetime
 import asyncio
-import config_loader
 import logging
-
-config = config_loader.loadYaml()
-HOST = config['HOST']
-PORT = config['PORT']
+import server_info
 
 # Logging
 logger = logging.getLogger('logs')
@@ -14,27 +10,27 @@ logger.setLevel(logging.INFO)
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 # Send command to execute certain gamemode
-async def gamemodeStart(gamemode):
+async def gamemodeStart(host, port, gamemode):
     if gamemode == 'nade-practice':
-        await sendCMD('exec nadeprac')
+        await sendCMD(host, port, 'exec nadeprac')
 
 # Send changelevel command to server
-async def changemap(map):
+async def changemap(host, port, map):
     cmd = (f'changelevel de_{map}')
-    await sendCMD(cmd)
+    await sendCMD(host, port, cmd)
 
 # Get server password
-async def getPassword():
-    response = await sendCMD('-get-password')
+async def getPassword(host, port):
+    response = await sendCMD(host, port, '-get-password')
     return response
 
 # Get server port
-async def getServerPort():
-    response = await sendCMD('-get-port')
+async def getServerPort(host, port):
+    response = await sendCMD(host, port, '-get-port')
     return response
 
 # Send packet to server
-async def sendCMD(cmd):
+async def sendCMD(HOST, PORT, cmd):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         if cmd != '-update-server':
             s.settimeout(20)
@@ -50,7 +46,7 @@ async def automatedUpdateServer():
         time = datetime.utcnow()
         actualTime = time.hour*3600 + time.minute*60 + time.second
 
-        # calculate time till 6am cst
+        # Calculate time till 6am cst
         if actualTime == 43200:
             waitTime = 0
         elif actualTime < 43200:
@@ -59,4 +55,5 @@ async def automatedUpdateServer():
             waitTime = 86400 - actualTime + 43200
         await asyncio.sleep(waitTime)
         logger.info('Auto updating server and restarting...')
-        sendCMD('-update-server')
+        for server in server_info.serverList.keys():
+            await sendCMD(server.ip, server.controllerPort, '-update-server')

@@ -22,7 +22,7 @@ password = config['dbpassword']
 #conn.close()
 
 # Add server to database
-async def addServer(ip, location, discordName, port):
+async def addServer(ip, location, discordName, port, link):
     with psycopg2.connect(host=host, user=user, password=password, dbname=dbname) as conn:
         with conn.cursor() as cur:
             cur.execute('SELECT * FROM serverlist;')
@@ -31,10 +31,12 @@ async def addServer(ip, location, discordName, port):
             for server in servers:
                 if server[2] == location and server[3] == discordName:
                     numServers += 1
+            state = stateToAbbrev[0].upper()
+            state += stateToAbbrev[1:].lower()
             serverid = f'{discordName}-{stateToAbbrev[location]}'
             if numServers > 0:
                 serverid += f'-{str(numServers)}'
-            cur.execute('INSERT INTO serverlist VALUES (%s, %s, %s, %s, %s)', (ip, serverid, location, discordName, port))
+            cur.execute('INSERT INTO serverlist VALUES (%s, %s, %s, %s, %s, %s)', (ip, serverid, location, discordName, port, link))
             conn.commit()
 
 # Get list of servers in database
@@ -42,4 +44,4 @@ async def getServers():
     with psycopg2.connect(host=host, user=user, password=password, dbname=dbname) as conn:
         with conn.cursor() as cur:
             cur.execute('SELECT * FROM serverlist;')
-    return cur.fetchall()
+            return cur.fetchall()

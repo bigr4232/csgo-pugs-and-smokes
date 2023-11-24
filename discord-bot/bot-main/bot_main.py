@@ -13,6 +13,7 @@ import databaseServerHandler as dsh
 import server_info
 
 # Intents, tree inits, globals
+__version__ = '2.0.0'
 intents = discord.Intents.default()
 intents.message_content = True
 client = discord.Client(intents=intents)
@@ -301,6 +302,20 @@ async def addDatabase(ctx: discord.Interaction, ip: str, controllerport: str, st
             await ctx.response.send_message('State does not exist, please retry with valid state name', delete_after=30)
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
+
+# Add ! commands for hidden commands
+@client.event
+async def on_message(ctx):
+    if not ctx.guild:
+        guild = client.get_guild(int(config['discordGuildID']))
+        member = await guild.fetch_member(ctx.user.id)
+        memberRoles = member.roles
+    else:
+        memberRoles = ctx.user.roles
+    if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
+        if ctx.content.startswith('!'):
+            if ctx.content[1:] == 'version':
+                ctx.channel.send(f'Version: {__version__}')
 
 # Initialization
 @client.event

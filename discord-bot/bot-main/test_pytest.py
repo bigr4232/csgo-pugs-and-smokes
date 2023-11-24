@@ -1,6 +1,6 @@
 import pytest
 import command_sender
-import databaseHandler
+import databaseServerHandler as dsh
 import asyncio
 
 @pytest.mark.asyncio
@@ -10,4 +10,4 @@ async def testNumPlayers():
 
 @pytest.mark.asyncio
 async def testAddServer():
-    await databaseHandler.addServer('70.1.1.1', 'Arizona', '***REMOVED***')
+    await dsh.addServer('70.1.1.1', 'Arizona', '***REMOVED***')

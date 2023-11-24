@@ -8,6 +8,9 @@ import logging
 import random
 import sys
 from tenManSim import fillTenMan
+from state_to_abbrevation import stateList
+import databaseServerHandler as dsh
+import server_info
 
 # Intents, tree inits, globals
 intents = discord.Intents.default()
@@ -22,6 +25,7 @@ tenManMessage = dict()
 sortedList = dict()
 simTenMan = False
 serverPassword = ''
+asyncio.run(server_info.updateServers())
 
 # get args
 for arg in sys.argv:
@@ -138,7 +142,8 @@ async def tenMans(ctx: discord.Interaction, option:app_commands.Choice[str]):
 
 # Start server command
 @tree.command(name='start-server', description='send command to server to start')
-async def startServerCommand(ctx: discord.Interaction):
+@app_commands.choices(serverchoice=[app_commands.Choice(name=serverID, value=serverID) for serverID in server_info.serverList.keys()])
+async def startServerCommand(ctx: discord.Interaction, serverchoice: app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called server command start-server')
     if not ctx.guild:
         guild = client.get_guild(int(config['discordGuildID']))
@@ -148,13 +153,15 @@ async def startServerCommand(ctx: discord.Interaction):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Starting Counter Strike server.', delete_after=30)
-        await command_sender.sendCMD('-start-server')
+        await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
+                                     server_info.serverList[serverchoice.name].controllerPort, '-start-server')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
 # Stop server command
 @tree.command(name='stop-server', description='send command to server to stop')
-async def stopServerCommand(ctx: discord.Interaction):
+@app_commands.choices(serverchoice=[app_commands.Choice(name=serverID, value=serverID) for serverID in server_info.serverList.keys()])
+async def stopServerCommand(ctx: discord.Interaction, serverchoice: app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called server command stop-server')
     if not ctx.guild:
         guild = client.get_guild(int(config['discordGuildID']))
@@ -164,13 +171,15 @@ async def stopServerCommand(ctx: discord.Interaction):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Stopping Counter Strike server.', delete_after=30)
-        await command_sender.sendCMD('-stop-server')
+        await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
+                                     server_info.serverList[serverchoice.name].controllerPort, '-stop-server')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
         
 # Restart server command
 @tree.command(name='restart-server', description='send command to server to restart')
-async def restartServerCommand(ctx: discord.Interaction):
+@app_commands.choices(serverchoice=[app_commands.Choice(name=serverID, value=serverID) for serverID in server_info.serverList.keys()])
+async def restartServerCommand(ctx: discord.Interaction, serverchoice: app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called server command restart-server')
     if not ctx.guild:
         guild = client.get_guild(int(config['discordGuildID']))
@@ -180,19 +189,22 @@ async def restartServerCommand(ctx: discord.Interaction):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Restarting Counter Strike server.', delete_after=30)
-        await command_sender.sendCMD('-restart-server')
+        await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
+                                     server_info.serverList[serverchoice.name].controllerPort, '-restart-server')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
 # Start gamemode
 @tree.command(name='gamemode', description='start gamemode on the server specified by the option')
+@app_commands.choices(serverchoice=[app_commands.Choice(name=serverID, value=serverID) for serverID in server_info.serverList.keys()])
 @app_commands.choices(option=[app_commands.Choice(name='nade-practice', value='nade-practice')])
-async def serverGameModeCommand(ctx: discord.Interaction, option:app_commands.Choice[str]):
+async def serverGameModeCommand(ctx: discord.Interaction, option: app_commands.Choice[str], serverchoice: app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called server command gamemode with option {option.name}')
     await ctx.response.send_message(f'Switching server to gamemode {option.value}', delete_after=30)
     global gamemode
     gamemode = 'nade-practice'
-    await command_sender.gamemodeStart(option.value)
+    await command_sender.gamemodeStart(server_info.serverList[serverchoice.name].ip,
+                                     server_info.serverList[serverchoice.name].controllerPort, option.value)
 
 # Change map
 @tree.command(name='changemap', description='changemap to specified map')
@@ -204,16 +216,20 @@ async def serverGameModeCommand(ctx: discord.Interaction, option:app_commands.Ch
                               app_commands.Choice(name='nuke', value='nuke'),
                               app_commands.Choice(name='overpass', value='overpass'),
                               app_commands.Choice(name='vertigo', value='vertigo')])
-async def changeMap(ctx: discord.Interaction, option:app_commands.Choice[str]):
+@app_commands.choices(serverchoice=[app_commands.Choice(name=serverID, value=serverID) for serverID in server_info.serverList.keys()])
+async def changeMap(ctx: discord.Interaction, option:app_commands.Choice[str], serverchoice: app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called server command changemap with option {option.name}')
     await ctx.response.send_message(f'Switching server to the map {option.value}', delete_after=30)
-    await command_sender.changemap(option.value)
+    await command_sender.changemap(server_info.serverList[serverchoice.name].ip,
+                                     server_info.serverList[serverchoice.name].controllerPort, option.value)
     await asyncio.sleep(10)
-    await command_sender.gamemodeStart(gamemode)
+    await command_sender.gamemodeStart(server_info.serverList[serverchoice.name].ip,
+                                     server_info.serverList[serverchoice.name].controllerPort, gamemode)
 
 # Send server command
 @tree.command(name='send-server-command', description='Send a command to the server')
-async def sendServerCommand(ctx: discord.Interaction, command: str):
+@app_commands.choices(serverchoice=[app_commands.Choice(name=serverID, value=serverID) for serverID in server_info.serverList.keys()])
+async def sendServerCommand(ctx: discord.Interaction, command: str, serverchoice: app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called server command send-server-command with command {command}')
     if not ctx.guild:
         guild = client.get_guild(int(config['discordGuildID']))
@@ -223,22 +239,27 @@ async def sendServerCommand(ctx: discord.Interaction, command: str):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message(f'Sending command to server {command}', delete_after=30)
-        await command_sender.sendCMD(command)
+        await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
+                                     server_info.serverList[serverchoice.name].controllerPort, command)
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
 # Get server info command
 @tree.command(name='get-server-info', description='Get info to connect to cs server')
-async def getServerInfo(ctx: discord.Interaction):
+@app_commands.choices(serverchoice=[app_commands.Choice(name=serverID, value=serverID) for serverID in server_info.serverList.keys()])
+async def getServerInfo(ctx: discord.Interaction, serverchoice: app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called server command get-server-info')
-    serverPassword = await command_sender.getPassword()
-    port = await command_sender.getServerPort()
-    ip = await getIP()
+    serverPassword = await command_sender.getPassword(server_info.serverList[serverchoice.name].ip,
+                                     server_info.serverList[serverchoice.name].controllerPort, )
+    port = await command_sender.getServerPort(server_info.serverList[serverchoice.name].ip,
+                                     server_info.serverList[serverchoice.name].controllerPort, )
+    ip = server_info[serverchoice.name].ip
     await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', view=ButtonForServer())
 
 # Command to update server
 @tree.command(name='update-server', description='Update cs2 server if there is an update available')
-async def updateServer(ctx: discord.Interaction):
+@app_commands.choices(serverchoice=[app_commands.Choice(name=serverID, value=serverID) for serverID in server_info.serverList.keys()])
+async def updateServer(ctx: discord.Interaction, serverchoice: app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called server command update-server')
     if not ctx.guild:
         guild = client.get_guild(int(config['discordGuildID']))
@@ -248,8 +269,36 @@ async def updateServer(ctx: discord.Interaction):
         memberRoles = ctx.user.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.defer()
-        await command_sender.sendCMD('-update-server')
+        await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
+                                     server_info.serverList[serverchoice.name].controllerPort, '-update-server')
         await ctx.followup.send('Server is updated and running.')
+    else:
+        await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
+
+# Add server to database
+@tree.command(name='add-server', description='add server to database')
+async def addDatabase(ctx: discord.Interaction, ip: str, controllerport: str, state: str, link: str):
+    logger.info(f'{ctx.user.name} called server command update-server')
+    if not ctx.guild:
+        guild = client.get_guild(int(config['discordGuildID']))
+        member = await guild.fetch_member(ctx.user.id)
+        memberRoles = member.roles
+    else:
+        memberRoles = ctx.user.roles
+    if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
+        stateExists = False
+        lowerState = state.lower()
+        for s in stateList:
+            if lowerState == s:
+                stateExists = True
+        if stateExists:
+            logger.info('Adding server to database')
+            await ctx.response.send_message('Adding server to database', delete_after=30)
+            await dsh.addServer(ip, state, ctx.user.display_name, controllerport, link)
+            await server_info.updateServers()
+            await tree.sync()
+        else:
+            await ctx.response.send_message('State does not exist, please retry with valid state name', delete_after=30)
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 

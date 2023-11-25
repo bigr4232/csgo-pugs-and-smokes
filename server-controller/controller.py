@@ -7,6 +7,7 @@ import logging
 import sys
 
 # Globals
+__version__ = '1.0.1'
 content = config_loader.loadYaml()
 HOST = '0.0.0.0'
 PORT = int(content['PORT'])
@@ -20,7 +21,7 @@ else:
 # Get input args
 debugMode = False
 for arg in sys.argv:
-    if arg == '-d':
+    if arg == '-log':
         debugMode = True
 
 # Logging
@@ -169,6 +170,7 @@ async def startTCPServer(s):
 # Start server socket. If error, wait 60 seconds and retry
 async def main():
     try:
+        logger.info(f'Starting cs server controller (v{__version__})')
         logger.info('Attempting server connection')
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

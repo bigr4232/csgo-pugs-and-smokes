@@ -320,8 +320,9 @@ async def on_message(ctx):
 # Initialization
 @client.event
 async def on_ready():
+    logger.info(f'Starting bot with version {__version__}')
     await tree.sync()
-    logger.info("connected")
+    logger.debug("commands synced")
     await command_sender.automatedUpdateServer()
 
 client.run(config['discordBotToken'])

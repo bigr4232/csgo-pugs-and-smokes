@@ -123,9 +123,9 @@ async def getPassword():
     return response
 
 # Update server
-async def updateServer(steamCMDpath, csgoServerPath, startCommand, username, password):
+async def updateServer(csgoServerPath, startCommand):
     await stopServer()
-    cmd = f'{steamCMDpath} +force_install_dir {csgoServerPath} +login {username} {password} +app_update 730 +quit'
+    cmd = f'steamcmd +force_install_dir {csgoServerPath} +login anonymous +app_update 730 +quit'
     subprocess.run(cmd, shell=True)
     await startServer(startCommand)
 
@@ -150,7 +150,7 @@ async def parseCommand(cmd):
             await asyncio.sleep(1)
             await startServer(content['startCommand'])
         elif cmd[1:] == 'update-server':
-            await updateServer(content['steamCMDInstallPath'], csServerPath, content['startCommand'], content['serverLoginUsername'], content['serverLoginPassword'])
+            await updateServer(csServerPath, content['startCommand'])
         elif cmd[1:] == 'get-password':
             returnVal = await getPassword()
         elif cmd[1:] == 'get-port':

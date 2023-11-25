@@ -8,7 +8,7 @@ import logging
 import random
 import sys
 from tenManSim import fillTenMan
-from state_to_abbrevation import stateList
+from state_to_abbrevation import stateList, stateToAbbrev
 import databaseServerHandler as dsh
 import server_info
 import datetime
@@ -46,12 +46,52 @@ for arg in sys.argv:
         fh.setLevel(logging.DEBUG)
         logger.addHandler(fh)
 
+# Print output for server status
+async def serverInfoOutput(serverID):
+    serverStatus = command_sender.getServerStatus(server_info.serverList[serverID].IP, server_info.serverList[serverID].controllerPort)
+    ip = server_info.serverList[serverID].IP
+    controllerPort = server_info.serverList[serverID].controllerPort
+    serverPort = await command_sender.getServerPort(ip, controllerPort)
+    password = await command_sender.getPassword(ip, controllerPort)
+    serverInfoString = ''
+    serverInfoString += 'IP: ' + ip + '\n'
+    serverInfoString += 'Port: ' + serverPort + '\n'
+    serverInfoString += 'Location: ' + server_info.serverList[serverID].location
+    if serverStatus:
+        serverInfoString += 'Server status: Online\n'
+        serverInfoString += 'Server password: ' + password + '\n'
+        serverInfoString += 'connect ' + ip + ':' + serverPort + '; password ' + password
+    else:
+        serverInfoString += 'Server status: Offline\n'
+    return serverInfoString, serverStatus
+
+
+    
 # Class for connect to server button
 class ButtonForServer(discord.ui.View):
-    def __init__(self):
+    def __init__(self, location, url):
         super().__init__()
-        url = f'https://cs-pho.bigr.dev'
-        self.add_item(discord.ui.Button(label='Connect', url=url, style=discord.ButtonStyle.green))
+        self.add_item(discord.ui.Button(label=f'Connect {location}', url=url))
+
+# Selection menu for cs servers
+class ServerSelect(discord.ui.Select):
+    def __init__(self):
+        options = [discord.SelectOption(label=server, value=server) for server in server_info.serverList.keys()]
+        super().__init__(placeholder='Select a server location', max_values=1, min_values=1, options=options)
+    async def callback(self, ctx: discord.Interaction):
+        serverID = self.values[0]
+        location = server_info.serverList[serverID].location
+        link = server_info.serverList[serverID].link
+        message, serverStatus = await serverInfoOutput(serverID)
+        if serverStatus:
+            await ctx.response.send_message(message, view=ButtonForServer(location, link))
+        else:
+            await ctx.response.send_message(message)
+
+class ServerSelectView(discord.ui.View):
+    def __init__(self, *, timeout = 200):
+        super().__init__(timeout=timeout)
+        self.add_item(ServerSelect())
 
 # Class for 10 mans buttons
 class TenMansButton(discord.ui.View):
@@ -125,12 +165,12 @@ async def tenMans(ctx: discord.Interaction, option:app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called ten-mans command with option {option.name}')
     if option.name == 'start':
         if ctx.guild.id not in tenManMessage or tenManMessage[ctx.guild.id] == 0:
-            await ctx.response.send_message('Starting 10 mans')
+            await ctx.response.send_message('Starting 10 mans', delete_after=200)
             message = await ctx.channel.send('0/10 players joined', view=TenMansButton())
             tenManMessage.update({ctx.guild.id : message})
             tenManPlayers[ctx.guild.id] = set()
         else:
-            await ctx.response.send_message('10 mans already started. Please cancel before starting again')
+            await ctx.response.send_message('10 mans already started. Please cancel before starting again', delete_after=30)
     elif option.name == 'cancel':
         if ctx.guild.id in tenManMessage:
             await ctx.response.send_message('Ending 10 mans', delete_after=30)
@@ -140,10 +180,10 @@ async def tenMans(ctx: discord.Interaction, option:app_commands.Choice[str]):
             await ctx.response.send_message('No 10 mans running', delete_after=30)
     elif option.name == 're-scramble':
         if ctx.guild.id in sortedList:
-            await ctx.response.send_message(f'Re-scrambling Teams')
+            await ctx.response.send_message(f'Re-scrambling Teams', delete_after=200)
             await rescrambleTenMans(ctx)
         else:
-            await ctx.response.send_message('Teams have not been set in this server') 
+            await ctx.response.send_message('Teams have not been set in this server', delete_after=30) 
 
 # Start server command
 @tree.command(name='start-server', description='send command to server to start')
@@ -251,15 +291,9 @@ async def sendServerCommand(ctx: discord.Interaction, command: str, serverchoice
 
 # Get server info command
 @tree.command(name='get-server-info', description='Get info to connect to cs server')
-@app_commands.choices(serverchoice=[app_commands.Choice(name=serverID, value=serverID) for serverID in server_info.serverList.keys()])
-async def getServerInfo(ctx: discord.Interaction, serverchoice: app_commands.Choice[str]):
+async def getServerInfo(ctx: discord.Interaction):
     logger.info(f'{ctx.user.name} called server command get-server-info')
-    serverPassword = await command_sender.getPassword(server_info.serverList[serverchoice.name].ip,
-                                    server_info.serverList[serverchoice.name].controllerPort, )
-    port = await command_sender.getServerPort(server_info.serverList[serverchoice.name].ip,
-                                    server_info.serverList[serverchoice.name].controllerPort, )
-    ip = server_info[serverchoice.name].ip
-    await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', view=ButtonForServer())
+    await ctx.response.send_message(f'Servers:', view=ServerSelectView())
 
 # Command to update server
 @tree.command(name='update-server', description='Update cs2 server if there is an update available')

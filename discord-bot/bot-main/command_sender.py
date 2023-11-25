@@ -29,6 +29,11 @@ async def getServerPort(host, port):
     response = await sendCMD(host, port, '-get-port')
     return response
 
+# Get info on if server is up (True) or down (False)
+async def getServerStatus(host, port):
+    response = await sendCMD(host, port, '-server-status')
+    return response
+
 # Send packet to server
 async def sendCMD(HOST, PORT, cmd):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

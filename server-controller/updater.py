@@ -11,10 +11,7 @@ logger.setLevel(logging.INFO)
 def updateYaml():
     port = input('Enter port for TCP server: ')
     startcommand = input('Enter the start command to run the server: ')
-    steamcmdinstallpath = input('Enter the path to the steamcmd directory: ')
-    serverusername = input('Enter the username of the account used to login and download the server: ')
-    serverpassword = input('Enter the password of the account used to login and download the server: ')
-    setYaml(port, startcommand, steamcmdinstallpath, serverusername, serverpassword)
+    setYaml(port, startcommand)
 
 def updateFiles(dst):
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))

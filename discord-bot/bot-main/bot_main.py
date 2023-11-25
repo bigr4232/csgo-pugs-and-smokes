@@ -356,12 +356,38 @@ async def on_message(ctx):
             if ctx.content[1:] == 'version':
                 await ctx.channel.send(f'Version: {__version__}')
 
+# Check controller versions
+async def checkControllerVerion():
+    incompatibleServers = list()
+    compatibleVersion = __version__.split('.')
+    for server in server_info.serverList.keys():
+        version = await command_sender.getControllerVersion(server_info.serverList[server].IP, server_info.serverList[server].controllerPort)
+        version = version.split('.')
+        if int(version[0]) == int(compatibleVersion[0]):
+            if int(version[1]) == int(compatibleVersion[1]):
+                if int(version[2]) < int (compatibleVersion[2]):
+                    incompatibleServers.append(server)
+            elif int(version[1]) < int(compatibleVersion[1]):
+                incompatibleServers.append(server)
+        elif int(version[0]) < int(compatibleVersion[0]):
+            incompatibleServers.append(server)
+    if len(incompatibleServers) > 0:
+        message = 'The following servers have out of date controllers and should be updated before using the bot with them:'
+        for server in incompatibleServers:
+            message += '\n' + server
+        channel = client.get_channel(config['discordChannel'])
+        await channel.send(message)
+        logger.info(message)
+
+
+
 # Initialization
 @client.event
 async def on_ready():
     logger.info(f'Starting bot v{__version__}')
     await tree.sync()
     logger.debug("commands synced")
+    await checkControllerVerion()
     await command_sender.automatedUpdateServer()
 
 client.run(config['discordBotToken'])

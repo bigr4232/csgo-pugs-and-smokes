@@ -5,6 +5,7 @@ import subprocess
 import os
 import logging
 import sys
+import datetime
 
 # Globals
 __version__ = '1.0.1'
@@ -20,9 +21,15 @@ else:
 
 # Get input args
 debugMode = False
+logger = logging.getLogger('logs')
 for arg in sys.argv:
     if arg == '-log':
         debugMode = True
+        now = datetime.datetime.now()
+        pre = now.strftime("%Y-%m-%d_%H:%M:%S")
+        fh = logging.FileHandler(f'controller-{pre}-logs.log')
+        fh.setLevel(logging.DEBUG)
+        logger.addHandler(fh)
 
 # Logging
 logger = logging.getLogger('logs')

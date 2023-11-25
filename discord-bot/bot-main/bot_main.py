@@ -11,6 +11,7 @@ from tenManSim import fillTenMan
 from state_to_abbrevation import stateList
 import databaseServerHandler as dsh
 import server_info
+import datetime
 
 # Intents, tree inits, globals
 __version__ = '2.0.0'
@@ -28,15 +29,22 @@ simTenMan = False
 serverPassword = ''
 asyncio.run(server_info.updateServers())
 
-# get args
-for arg in sys.argv:
-    if arg == '-sim10man':
-        simTenMan = True
-
 # Logging
 logger = logging.getLogger('logs')
 logger.setLevel(logging.INFO)
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+
+# get args
+for arg in sys.argv:
+    if arg == '-sim10man':
+        simTenMan = True
+    if arg == '-log':
+        logger.setLevel(logging.DEBUG)
+        now = datetime.datetime.now()
+        pre = now.strftime("%Y-%m-%d_%H:%M:%S")
+        fh = logging.FileHandler(f'bot-{pre}-logs.log')
+        fh.setLevel(logging.DEBUG)
+        logger.addHandler(fh)
 
 # Class for connect to server button
 class ButtonForServer(discord.ui.View):
@@ -293,9 +301,6 @@ async def addDatabase(ctx: discord.Interaction, ip: str, controllerport: str, st
             await ctx.response.send_message('Adding server to database', delete_after=30)
             await dsh.addServer(ip, state, ctx.user.display_name, controllerport, link)
             await server_info.updateServers()
-            await tree.walk_commands()
-            await tree.sync()
-            test = tree._get_all_commands()
             print()
         else:
             await ctx.response.send_message('State does not exist, please retry with valid state name', delete_after=30)

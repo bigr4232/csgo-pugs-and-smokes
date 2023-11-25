@@ -34,6 +34,11 @@ async def getServerStatus(host, port):
     response = await sendCMD(host, port, '-server-status')
     return response
 
+# Get controller version
+async def getControllerVersion(host, port):
+    response = await sendCMD(host, port, '-controller-version')
+    return response
+
 # Send packet to server
 async def sendCMD(HOST, PORT, cmd):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

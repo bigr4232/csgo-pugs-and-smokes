@@ -85,7 +85,9 @@ class ServerSelect(discord.ui.Select):
         location = server_info.serverList[serverID].location
         link = server_info.serverList[serverID].link
         message, serverStatus = await serverInfoOutput(serverID)
-        if serverStatus:
+        if serverID in incompatibleServers:
+            await ctx.response.send_message('Please update the server controller of this server to use it.')
+        elif serverStatus:
             await ctx.response.send_message(message, view=ButtonForServer(location, link))
         else:
             await ctx.response.send_message(message)

@@ -319,15 +319,9 @@ async def on_message(ctx):
 # Initialization
 @client.event
 async def on_ready():
-    logger.info(f'Starting bot with version {__version__}')
+    logger.info(f'Starting bot v{__version__}')
     await tree.sync()
     logger.debug("commands synced")
-    test = tree._get_all_commands()
-    choice = app_commands.Choice(name='test123', value='test123')
-    test[2].parameters[0].choices.append(choice)
-    newChoices = test[2].parameters[0].choices
-    test[2].parameters[0].choices = newChoices
-    newTest = tree._get_all_commands()
     await command_sender.automatedUpdateServer()
 
 client.run(config['discordBotToken'])

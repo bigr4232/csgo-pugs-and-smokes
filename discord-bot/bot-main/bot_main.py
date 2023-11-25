@@ -290,7 +290,7 @@ async def addDatabase(ctx: discord.Interaction, ip: str, controllerport: str, st
         stateExists = False
         lowerState = state.lower()
         for s in stateList:
-            if lowerState == s:
+            if lowerState == s.lower():
                 stateExists = True
         if stateExists:
             logger.info('Adding server to database')
@@ -298,6 +298,7 @@ async def addDatabase(ctx: discord.Interaction, ip: str, controllerport: str, st
             await dsh.addServer(ip, state, ctx.user.display_name, controllerport, link)
             await server_info.updateServers()
             await tree.sync()
+            test = tree._get_all_commands()
         else:
             await ctx.response.send_message('State does not exist, please retry with valid state name', delete_after=30)
     else:
@@ -323,6 +324,7 @@ async def on_ready():
     logger.info(f'Starting bot with version {__version__}')
     await tree.sync()
     logger.debug("commands synced")
+    test = tree._get_all_commands()
     await command_sender.automatedUpdateServer()
 
 client.run(config['discordBotToken'])

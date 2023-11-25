@@ -50,8 +50,8 @@ for arg in sys.argv:
 
 # Print output for server status
 async def serverInfoOutput(serverID):
-    serverStatus = command_sender.getServerStatus(server_info.serverList[serverID].IP, server_info.serverList[serverID].controllerPort)
-    ip = server_info.serverList[serverID].IP
+    serverStatus = command_sender.getServerStatus(server_info.serverList[serverID].ip, server_info.serverList[serverID].controllerPort)
+    ip = server_info.serverList[serverID].ip
     controllerPort = server_info.serverList[serverID].controllerPort
     serverPort = await command_sender.getServerPort(ip, controllerPort)
     password = await command_sender.getPassword(ip, controllerPort)
@@ -382,7 +382,7 @@ async def on_message(ctx):
 async def checkControllerVerion():
     compatibleVersion = __version__.split('.')
     for server in server_info.serverList.keys():
-        version = await command_sender.getControllerVersion(server_info.serverList[server].IP, server_info.serverList[server].controllerPort)
+        version = await command_sender.getControllerVersion(server_info.serverList[server].ip, server_info.serverList[server].controllerPort)
         version = version.split('.')
         if int(version[0]) == int(compatibleVersion[0]):
             if int(version[1]) == int(compatibleVersion[1]):

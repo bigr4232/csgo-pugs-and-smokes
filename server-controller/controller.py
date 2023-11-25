@@ -155,6 +155,8 @@ async def parseCommand(cmd):
             returnVal = await getPassword()
         elif cmd[1:] == 'get-port':
             returnVal = csServerPort
+        elif cmd[1:] == 'server-status':
+            returnVal = await str(serverRunning)
     else:
         await sendCMD(cmd)
     return returnVal

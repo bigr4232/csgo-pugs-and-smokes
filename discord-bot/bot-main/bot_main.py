@@ -73,10 +73,6 @@ class TenMansButton(discord.ui.View):
             tenManPlayers[ctx.guild.id].remove(ctx.user)
         await ctx.response.edit_message(content = await tenManStatus(ctx), view=self)
 
-# Get IP
-async def getIP():
-    return get('https://api.ipify.org').content.decode('utf8')
-
 # Make message to send for 10 man status
 async def tenManStatus(ctx):
     message = f'{len(tenManPlayers[ctx.guild.id])}/10 players joined:'
@@ -115,8 +111,8 @@ async def rescrambleTenMans(ctx):
 # Ten mans discord command
 @tree.command(name='ten-mans', description='start 10 mans')
 @app_commands.choices(option=[app_commands.Choice(name='start', value='start'),
-                      app_commands.Choice(name='cancel', value='cancel'),
-                      app_commands.Choice(name='re-scramble', value='re-scramble')])
+                    app_commands.Choice(name='cancel', value='cancel'),
+                    app_commands.Choice(name='re-scramble', value='re-scramble')])
 async def tenMans(ctx: discord.Interaction, option:app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called ten-mans command with option {option.name}')
     if option.name == 'start':
@@ -155,7 +151,7 @@ async def startServerCommand(ctx: discord.Interaction, serverchoice: app_command
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Starting Counter Strike server.', delete_after=30)
         await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
-                                     server_info.serverList[serverchoice.name].controllerPort, '-start-server')
+                                    server_info.serverList[serverchoice.name].controllerPort, '-start-server')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
@@ -173,7 +169,7 @@ async def stopServerCommand(ctx: discord.Interaction, serverchoice: app_commands
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Stopping Counter Strike server.', delete_after=30)
         await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
-                                     server_info.serverList[serverchoice.name].controllerPort, '-stop-server')
+                                    server_info.serverList[serverchoice.name].controllerPort, '-stop-server')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
         
@@ -191,7 +187,7 @@ async def restartServerCommand(ctx: discord.Interaction, serverchoice: app_comma
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message('Restarting Counter Strike server.', delete_after=30)
         await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
-                                     server_info.serverList[serverchoice.name].controllerPort, '-restart-server')
+                                    server_info.serverList[serverchoice.name].controllerPort, '-restart-server')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
@@ -205,27 +201,27 @@ async def serverGameModeCommand(ctx: discord.Interaction, option: app_commands.C
     global gamemode
     gamemode = 'nade-practice'
     await command_sender.gamemodeStart(server_info.serverList[serverchoice.name].ip,
-                                     server_info.serverList[serverchoice.name].controllerPort, option.value)
+                                    server_info.serverList[serverchoice.name].controllerPort, option.value)
 
 # Change map
 @tree.command(name='changemap', description='changemap to specified map')
 @app_commands.choices(option=[app_commands.Choice(name='ancient', value='ancient'),
-                              app_commands.Choice(name='anubis', value='anubis'),
-                              app_commands.Choice(name='dust2', value='dust2'),
-                              app_commands.Choice(name='inferno', value='inferno'),
-                              app_commands.Choice(name='mirage', value='mirage'),
-                              app_commands.Choice(name='nuke', value='nuke'),
-                              app_commands.Choice(name='overpass', value='overpass'),
-                              app_commands.Choice(name='vertigo', value='vertigo')])
+                            app_commands.Choice(name='anubis', value='anubis'),
+                            app_commands.Choice(name='dust2', value='dust2'),
+                            app_commands.Choice(name='inferno', value='inferno'),
+                            app_commands.Choice(name='mirage', value='mirage'),
+                            app_commands.Choice(name='nuke', value='nuke'),
+                            app_commands.Choice(name='overpass', value='overpass'),
+                            app_commands.Choice(name='vertigo', value='vertigo')])
 @app_commands.choices(serverchoice=[app_commands.Choice(name=serverID, value=serverID) for serverID in server_info.serverList.keys()])
 async def changeMap(ctx: discord.Interaction, option:app_commands.Choice[str], serverchoice: app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called server command changemap with option {option.name}')
     await ctx.response.send_message(f'Switching server to the map {option.value}', delete_after=30)
     await command_sender.changemap(server_info.serverList[serverchoice.name].ip,
-                                     server_info.serverList[serverchoice.name].controllerPort, option.value)
+                                    server_info.serverList[serverchoice.name].controllerPort, option.value)
     await asyncio.sleep(10)
     await command_sender.gamemodeStart(server_info.serverList[serverchoice.name].ip,
-                                     server_info.serverList[serverchoice.name].controllerPort, gamemode)
+                                    server_info.serverList[serverchoice.name].controllerPort, gamemode)
 
 # Send server command
 @tree.command(name='send-server-command', description='Send a command to the server')
@@ -241,7 +237,7 @@ async def sendServerCommand(ctx: discord.Interaction, command: str, serverchoice
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.send_message(f'Sending command to server {command}', delete_after=30)
         await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
-                                     server_info.serverList[serverchoice.name].controllerPort, command)
+                                    server_info.serverList[serverchoice.name].controllerPort, command)
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
 
@@ -251,9 +247,9 @@ async def sendServerCommand(ctx: discord.Interaction, command: str, serverchoice
 async def getServerInfo(ctx: discord.Interaction, serverchoice: app_commands.Choice[str]):
     logger.info(f'{ctx.user.name} called server command get-server-info')
     serverPassword = await command_sender.getPassword(server_info.serverList[serverchoice.name].ip,
-                                     server_info.serverList[serverchoice.name].controllerPort, )
+                                    server_info.serverList[serverchoice.name].controllerPort, )
     port = await command_sender.getServerPort(server_info.serverList[serverchoice.name].ip,
-                                     server_info.serverList[serverchoice.name].controllerPort, )
+                                    server_info.serverList[serverchoice.name].controllerPort, )
     ip = server_info[serverchoice.name].ip
     await ctx.response.send_message(f'Server ip: {ip}\nServer port: {port}\nServer password: {serverPassword}\nconnect {ip}:{port}; password Tacos024', view=ButtonForServer())
 
@@ -271,7 +267,7 @@ async def updateServer(ctx: discord.Interaction, serverchoice: app_commands.Choi
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
         await ctx.response.defer()
         await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
-                                     server_info.serverList[serverchoice.name].controllerPort, '-update-server')
+                                    server_info.serverList[serverchoice.name].controllerPort, '-update-server')
         await ctx.followup.send('Server is updated and running.')
     else:
         await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
@@ -297,8 +293,10 @@ async def addDatabase(ctx: discord.Interaction, ip: str, controllerport: str, st
             await ctx.response.send_message('Adding server to database', delete_after=30)
             await dsh.addServer(ip, state, ctx.user.display_name, controllerport, link)
             await server_info.updateServers()
+            await tree.walk_commands()
             await tree.sync()
             test = tree._get_all_commands()
+            print()
         else:
             await ctx.response.send_message('State does not exist, please retry with valid state name', delete_after=30)
     else:
@@ -325,6 +323,11 @@ async def on_ready():
     await tree.sync()
     logger.debug("commands synced")
     test = tree._get_all_commands()
+    choice = app_commands.Choice(name='test123', value='test123')
+    test[2].parameters[0].choices.append(choice)
+    newChoices = test[2].parameters[0].choices
+    test[2].parameters[0].choices = newChoices
+    newTest = tree._get_all_commands()
     await command_sender.automatedUpdateServer()
 
 client.run(config['discordBotToken'])

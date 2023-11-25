@@ -31,12 +31,12 @@ async def addServer(ip, location, discordName, port, link):
             for server in servers:
                 if server[2] == location and server[3] == discordName:
                     numServers += 1
-            state = stateToAbbrev[0].upper()
-            state += stateToAbbrev[1:].lower()
+            state = location[0].upper()
+            state += location[1:].lower()
             serverid = f'{discordName}-{stateToAbbrev[location]}'
             if numServers > 0:
                 serverid += f'-{str(numServers)}'
-            cur.execute('INSERT INTO serverlist VALUES (%s, %s, %s, %s, %s, %s)', (ip, serverid, location, discordName, port, link))
+            cur.execute('INSERT INTO serverlist VALUES (%s, %s, %s, %s, %s, %s)', (ip, serverid, state, discordName, port, link))
             conn.commit()
 
 # Get list of servers in database

@@ -383,15 +383,18 @@ async def checkControllerVerion():
     compatibleVersion = __version__.split('.')
     for server in server_info.serverList.keys():
         version = await command_sender.getControllerVersion(server_info.serverList[server].ip, server_info.serverList[server].controllerPort)
-        version = version.split('.')
-        if int(version[0]) == int(compatibleVersion[0]):
-            if int(version[1]) == int(compatibleVersion[1]):
-                if int(version[2]) < int (compatibleVersion[2]):
-                    incompatibleServers.add(server)
-            elif int(version[1]) < int(compatibleVersion[1]):
-                incompatibleServers.add(server)
-        elif int(version[0]) < int(compatibleVersion[0]):
+        if version == '-':
             incompatibleServers.add(server)
+        else:
+            version = version.split('.')
+            if int(version[0]) == int(compatibleVersion[0]):
+                if int(version[1]) == int(compatibleVersion[1]):
+                    if int(version[2]) < int (compatibleVersion[2]):
+                        incompatibleServers.add(server)
+                elif int(version[1]) < int(compatibleVersion[1]):
+                    incompatibleServers.add(server)
+            elif int(version[0]) < int(compatibleVersion[0]):
+                incompatibleServers.add(server)
     if len(incompatibleServers) > 0:
         message = 'The following servers have out of date controllers and should be updated before using the bot with them:'
         for server in incompatibleServers:

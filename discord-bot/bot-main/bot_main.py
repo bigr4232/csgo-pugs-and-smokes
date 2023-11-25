@@ -50,16 +50,20 @@ for arg in sys.argv:
 
 # Print output for server status
 async def serverInfoOutput(serverID):
-    serverStatus = command_sender.getServerStatus(server_info.serverList[serverID].ip, server_info.serverList[serverID].controllerPort)
+    serverStatus = await command_sender.getServerStatus(server_info.serverList[serverID].ip, server_info.serverList[serverID].controllerPort)
+    if serverStatus == 'True':
+        serverStatus = True
+    else:
+        serverStatus = False
     ip = server_info.serverList[serverID].ip
     controllerPort = server_info.serverList[serverID].controllerPort
     serverPort = await command_sender.getServerPort(ip, controllerPort)
-    password = await command_sender.getPassword(ip, controllerPort)
     serverInfoString = ''
     serverInfoString += 'IP: ' + ip + '\n'
     serverInfoString += 'Port: ' + serverPort + '\n'
     serverInfoString += 'Location: ' + server_info.serverList[serverID].location + '\n'
     if serverStatus:
+        password = await command_sender.getPassword(ip, controllerPort)
         serverInfoString += 'Server status: Online\n'
         serverInfoString += 'Server password: ' + password + '\n'
         serverInfoString += 'connect ' + ip + ':' + serverPort + '; password ' + password
@@ -382,7 +386,7 @@ async def on_message(ctx):
 
 # Check controller versions
 async def checkControllerVerion():
-    compatibleVersion = __version__.split('.')
+    compatibleVersion = __requiredControllerVersion__.split('.')
     for server in server_info.serverList.keys():
         version = await command_sender.getControllerVersion(server_info.serverList[server].ip, server_info.serverList[server].controllerPort)
         if version == '-':

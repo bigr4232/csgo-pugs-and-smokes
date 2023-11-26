@@ -16,9 +16,10 @@ def updateYaml():
     discordguildid = input('Enter the id of the server/guild that the bot will be in: ')
     discordownerid = input('Enter the discord id of the bot owner for admin commands: ')
     discordadminrole = input('Enter the role id for the cs server admin role: ')
-    host = input('Enter the IP address for the server controller to connect to: ')
-    port = input('Enter the port the server controller is running on: ')
-    setYaml(discordbottoken, discordchannel, discordadminrole, discordguildid, discordownerid, host, port)
+    dbhost = input('Enter the IP address/hostname for the database of servers: ')
+    dbuser = input('Enter the database username for login: ')
+    dbpassword = input('Enter the database password for login: ')
+    setYaml(discordbottoken, discordchannel, discordadminrole, discordguildid, discordownerid, dbhost, dbuser, dbpassword)
 
 def updateFiles(dst):
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))

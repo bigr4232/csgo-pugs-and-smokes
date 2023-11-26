@@ -74,6 +74,16 @@ The [server] option is output where the user needs to specify which server to ap
 
   - re-scramble -> Rescrambles teams given by ten mans after teams have been posted
 
+- /addserver [ip] [controllerport] [state] [link]
+
+  - [ip] -> IP address of CS server controller to add as well as CS server
+
+  - [controllerport] -> port that the server controller is running on
+
+  - [state] -> US state that the server is located in
+
+  - [link] -> Link to website that will auto connect user to server
+
 ## config.yaml setup
 
 Updater will ask to set initial config variables. They can be reset later by manually

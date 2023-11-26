@@ -3,12 +3,11 @@ from discord import app_commands
 import config_loader
 import command_sender
 import asyncio
-from requests import get
 import logging
 import random
 import sys
 from tenManSim import fillTenMan
-from state_to_abbrevation import stateList, stateToAbbrev
+from state_to_abbrevation import stateList
 import databaseServerHandler as dsh
 import server_info
 import datetime

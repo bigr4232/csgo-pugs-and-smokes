@@ -1,8 +1,8 @@
-discordBotToken: ***REMOVED***
-discordChannel: ***REMOVED***
-discordAdminRole: ***REMOVED***
-discordGuildID: ***REMOVED***
-discordOwnerID: ***REMOVED***
-dbhost: ***REMOVED***
-dbuser: ***REMOVED***
-dbpassword: ***REMOVED***
+discordBotToken:
+discordChannel:
+discordAdminRole:
+discordGuildID:
+discordOwnerID:
+dbhost:
+dbuser:
+dbpassword:

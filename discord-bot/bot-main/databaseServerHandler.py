@@ -27,7 +27,7 @@ async def addServer(ip, location, discordName, port, link):
 
 # Get list of servers in database
 async def getServers():
-    with psycopg2.connect(host=host, user=user, password=password, dbname=dbname) as conn:
+    with psycopg2.connect(host=host, user=user, password=password, dbname='servers') as conn:
         with conn.cursor() as cur:
             cur.execute('SELECT * FROM serverlist;')
             return cur.fetchall()

@@ -32,7 +32,7 @@ def updateFiles(dst):
     shutil.copy(os.path.abspath('bot-main/tenManSim.py'), os.path.join(botPath, 'tenManSim.py'))
     shutil.copy(os.path.abspath('bot-main/databaseServerHandler.py'), os.path.join(botPath, 'databaseServerHandler.py'))
     shutil.copy(os.path.abspath('bot-main/server_info.py'), os.path.join(botPath, 'server_info.py'))
-    shutil.copy(os.path.abspath('bot-main/state_to_abbreviation.py'), os.path.join(botPath, 'state_to_abbreviation.py'))
+    shutil.copy(os.path.abspath('bot-main/state_to_abbrevation.py'), os.path.join(botPath, 'state_to_abbrevation.py'))
     shutil.copy('bot-main/config_loader.py', os.path.join(botPath, 'config_loader.py'))
     shutil.copy('requirements.txt', os.path.join(dst, 'requirements.txt'))
     shutil.copy('docker-compose.yml', os.path.join(dst, 'docker-compose.yml'))

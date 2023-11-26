@@ -3,5 +3,6 @@ discordChannel:
 discordAdminRole:
 discordGuildID:
 discordOwnerID:
-HOST:
-PORT:
+dbhost:
+dbuser:
+dbpassword:

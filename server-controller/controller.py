@@ -156,7 +156,7 @@ async def parseCommand(cmd):
         elif cmd[1:] == 'get-port':
             returnVal = csServerPort
         elif cmd[1:] == 'server-status':
-            returnVal = await str(serverRunning)
+            returnVal = str(await serverRunning())
         elif cmd[1:] == 'controller-version':
             returnVal = __version__
     else:

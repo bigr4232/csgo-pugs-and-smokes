@@ -46,23 +46,25 @@ python bot-man/bot_main.py
 
 ## Available Slash Commands
 
-- /gamemode [option] -> Sets server to certain gamemode
+The [server] option is output where the user needs to specify which server to apply the command.
+
+- /gamemode [option] [server] -> Sets server to certain gamemode
 
   - nade-practice -> executes server nade practice config
 
-- /changemap [option] -> Changes server to specified map
+- /changemap [option] [server] -> Changes server to specified map
 
-- /update-server -> Updates the CS2 server and restarts it
+- /update-server [server] -> Updates the CS2 server and restarts it
 
-- /start-server -> Starts the CS2 server
+- /start-server [server] -> Starts the CS2 server
 
-- /stop-server -> Stops the CS2 server
+- /stop-server [server] -> Stops the CS2 server
 
-- /restart-server -> Restarts the CS2 server
+- /restart-server [server] -> Restarts the CS2 server
 
-- /get-server-info -> Get connect info to the CS2 server and display a button to connect directly
+- /get-server-info [server] -> Get connect info to the CS2 server and display a button to connect directly
 
-- /send-server-command -> Sends a CS command to the CS2 server that you would exectute in console
+- /send-server-command [server] -> Sends a CS command to the CS2 server that you would exectute in console
 
 - /ten-mans [option] -> Used for ten man pugs
 
@@ -89,9 +91,11 @@ editing config.yaml.
 
 - discordOwnerID -> discord id of main admin of bot
 
-- HOST -> external IP address of server-controller that the bot communicates with
+- dbhost -> IP address or hostname of database
 
-- PORT -> Port to send packets on that IP address for the server-controller
+- dbuser -> Username to use to connect to database
+
+- dbpassword -> Password to connect to database
 
 ### config.yaml example
 
@@ -101,8 +105,10 @@ discordChannel: '894713448972934'
 discordAdminRole: '57489305729843792'
 discordGuildID: '4983217489016438921374'
 discordOwnerID: '4890371258937629185741'
-HOST: '99.743.234.12'
-PORT: 12345
+dbhost: 489.34.231.53
+dbuser: username4131
+dbpassword: Password123
+
 ```
 
 ## accounts.yaml setup

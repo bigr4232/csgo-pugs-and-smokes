@@ -32,3 +32,22 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 python controller.py
+
+## config.yaml setup
+
+Updater will ask to set initial config variables. They can be reset later by manually
+editing config.yaml.
+
+### Variables
+
+- PORT -> port to run the server-controller on
+
+- startCommand -> command to run CS server with
+
+### config.yaml example
+
+```yaml
+PORT: 48482
+startCommand: .\cs2.exe -dedicated +map de_dust2
+
+```

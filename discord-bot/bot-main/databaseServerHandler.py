@@ -19,7 +19,7 @@ async def addServer(ip, location, discordName, port, link):
                     numServers += 1
             state = location[0].upper()
             state += location[1:].lower()
-            serverid = f'{discordName}-{stateToAbbrev[location]}'
+            serverid = f'{discordName}-{stateToAbbrev[state]}'
             if numServers > 0:
                 serverid += f'-{str(numServers)}'
             cur.execute('INSERT INTO serverlist VALUES (%s, %s, %s, %s, %s, %s)', (ip, serverid, state, discordName, port, link))

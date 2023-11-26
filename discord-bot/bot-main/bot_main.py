@@ -363,7 +363,6 @@ async def addDatabase(ctx: discord.Interaction, ip: str, controllerport: str, st
             await ctx.response.send_message('Adding server to database', delete_after=30)
             await dsh.addServer(ip, state, ctx.user.display_name, controllerport, link)
             await server_info.updateServers()
-            print()
         else:
             await ctx.response.send_message('State does not exist, please retry with valid state name', delete_after=30)
     else:

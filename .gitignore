@@ -167,3 +167,4 @@ settings.json
 discord-bot/bot-main/test.py
 discord-bot/bot-main/clearcommands.py
 .DS_Store
+discord-bot/bot-main/test_pytest.py

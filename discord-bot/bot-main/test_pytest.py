@@ -10,4 +10,4 @@ async def testNumPlayers():
 
 @pytest.mark.asyncio
 async def testAddServer():
-    await dsh.addServer('70.1.1.1', 'Arizona', 'bigr4232')
+    await dsh.addServer('70.1.1.1', 'Arizona', '***REMOVED***')

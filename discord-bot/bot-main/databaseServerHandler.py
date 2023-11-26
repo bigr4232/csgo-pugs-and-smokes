@@ -14,11 +14,11 @@ async def addServer(ip, location, discordName, port, link):
             cur.execute('SELECT * FROM serverlist;')
             servers = cur.fetchall()
             numServers = 0
-            for server in servers:
-                if server[2] == location and server[3] == discordName:
-                    numServers += 1
             state = location[0].upper()
             state += location[1:].lower()
+            for server in servers:
+                if server[2] == state and server[3] == discordName:
+                    numServers += 1
             serverid = f'{discordName}-{stateToAbbrev[state]}'
             if numServers > 0:
                 serverid += f'-{str(numServers)}'

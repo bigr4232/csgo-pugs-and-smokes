@@ -12,35 +12,35 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S
 # Send command to execute certain gamemode
 async def gamemodeStart(host, port, gamemode):
     if gamemode == 'nade-practice':
-        await sendCMD(host, port, 'exec nadeprac')
+        sendCMD(host, port, 'exec nadeprac')
 
 # Send changelevel command to server
 async def changemap(host, port, map):
     cmd = (f'changelevel de_{map}')
-    await sendCMD(host, port, cmd)
+    sendCMD(host, port, cmd)
 
 # Get server password
 async def getPassword(host, port):
-    response = await sendCMD(host, port, '-get-password')
+    response = sendCMD(host, port, '-get-password')
     return response
 
 # Get server port
 async def getServerPort(host, port):
-    response = await sendCMD(host, port, '-get-port')
+    response = sendCMD(host, port, '-get-port')
     return response
 
 # Get info on if server is up (True) or down (False)
 async def getServerStatus(host, port):
-    response = await sendCMD(host, port, '-server-status')
+    response = sendCMD(host, port, '-server-status')
     return response
 
 # Get controller version
 async def getControllerVersion(host, port):
-    response = await sendCMD(host, port, '-controller-version')
+    response = sendCMD(host, port, '-controller-version')
     return response
 
 # Send packet to server
-async def sendCMD(HOST, PORT, cmd):
+def sendCMD(HOST, PORT, cmd):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         if cmd != '-update-server':
             s.settimeout(20)
@@ -66,4 +66,4 @@ async def automatedUpdateServer():
         await asyncio.sleep(waitTime)
         logger.info('Auto updating server and restarting...')
         for server in server_info.serverList.keys():
-            await sendCMD(server.ip, server.controllerPort, '-update-server')
+            sendCMD(server.ip, server.controllerPort, '-update-server')

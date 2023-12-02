@@ -11,6 +11,7 @@ from state_to_abbrevation import stateList
 import databaseServerHandler as dsh
 import server_info
 import datetime
+from concurrent.futures import ThreadPoolExecutor
 
 # Intents, tree inits, globals
 __version__ = '2.0.2'
@@ -206,7 +207,7 @@ async def startServerCommand(ctx: discord.Interaction, serverchoice: app_command
             memberRoles = ctx.user.roles
         if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
             await ctx.response.send_message('Starting Counter Strike server.', delete_after=30)
-            await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
+            command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
                                         server_info.serverList[serverchoice.name].controllerPort, '-start-server')
         else:
             await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
@@ -227,7 +228,7 @@ async def stopServerCommand(ctx: discord.Interaction, serverchoice: app_commands
             memberRoles = ctx.user.roles
         if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
             await ctx.response.send_message('Stopping Counter Strike server.', delete_after=30)
-            await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
+            command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
                                         server_info.serverList[serverchoice.name].controllerPort, '-stop-server')
         else:
             await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
@@ -248,7 +249,7 @@ async def restartServerCommand(ctx: discord.Interaction, serverchoice: app_comma
             memberRoles = ctx.user.roles
         if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
             await ctx.response.send_message('Restarting Counter Strike server.', delete_after=30)
-            await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
+            command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
                                         server_info.serverList[serverchoice.name].controllerPort, '-restart-server')
         else:
             await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
@@ -307,18 +308,19 @@ async def sendServerCommand(ctx: discord.Interaction, command: str, serverchoice
             memberRoles = ctx.user.roles
         if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
             await ctx.response.send_message(f'Sending command to server {command}', delete_after=30)
-            await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
+            command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
                                         server_info.serverList[serverchoice.name].controllerPort, command)
         else:
             await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
     else:
         await ctx.response.send_message('Please update the server controller of this server to use it.')
 
-# Get server info command
-@tree.command(name='get-server-info', description='Get info to connect to cs server')
-async def getServerInfo(ctx: discord.Interaction):
-    logger.info(f'{ctx.user.name} called server command get-server-info')
-    await ctx.response.send_message(f'Servers:', view=ServerSelectView())
+# Update server in new thread and send discord messages
+async def updateServerSend(ctx, server):
+    await ctx.response.defer()
+    command_sender.sendCMD(server_info.serverList[server.name].ip,
+                                server_info.serverList[server.name].controllerPort, '-update-server')
+    await ctx.followup.send('Server is updated and running.')
 
 # Command to update server
 @tree.command(name='update-server', description='Update cs2 server if there is an update available')
@@ -334,8 +336,10 @@ async def updateServer(ctx: discord.Interaction, serverchoice: app_commands.Choi
             memberRoles = ctx.user.roles
         if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
             await ctx.response.defer()
-            await command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
-                                        server_info.serverList[serverchoice.name].controllerPort, '-update-server')
+            loop = asyncio.get_event_loop()
+            ip = server_info.serverList[serverchoice.name].ip
+            port = server_info.serverList[serverchoice.name].controllerPort
+            await loop.run_in_executor(None, command_sender.sendCMD, ip, port, '-update-server')
             await ctx.followup.send('Server is updated and running.')
         else:
             await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)

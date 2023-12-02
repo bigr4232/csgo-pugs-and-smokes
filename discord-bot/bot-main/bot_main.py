@@ -315,13 +315,6 @@ async def sendServerCommand(ctx: discord.Interaction, command: str, serverchoice
     else:
         await ctx.response.send_message('Please update the server controller of this server to use it.')
 
-# Update server in new thread and send discord messages
-async def updateServerSend(ctx, server):
-    await ctx.response.defer()
-    command_sender.sendCMD(server_info.serverList[server.name].ip,
-                                server_info.serverList[server.name].controllerPort, '-update-server')
-    await ctx.followup.send('Server is updated and running.')
-
 # Command to update server
 @tree.command(name='update-server', description='Update cs2 server if there is an update available')
 @app_commands.choices(serverchoice=[app_commands.Choice(name=serverID, value=serverID) for serverID in server_info.serverList.keys()])

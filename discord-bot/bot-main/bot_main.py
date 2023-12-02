@@ -375,8 +375,8 @@ async def on_message(ctx):
     else:
         memberRoles = ctx.author.roles
     if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
-        if ctx.content.startswith('!'):
-            if ctx.content[1:] == 'version':
+        if ctx.content.startswith('!cs-bot'):
+            if ctx.content[8:] == 'version':
                 await ctx.channel.send(f'Version: {__version__}')
 
 # Check controller versions

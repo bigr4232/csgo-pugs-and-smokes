@@ -14,7 +14,7 @@ import datetime
 from concurrent.futures import ThreadPoolExecutor
 
 # Intents, tree inits, globals
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 __requiredControllerVersion__ = '1.0.1'
 intents = discord.Intents.default()
 intents.message_content = True
@@ -370,7 +370,7 @@ async def addDatabase(ctx: discord.Interaction, ip: str, controllerport: str, st
 async def on_message(ctx):
     if not ctx.guild:
         guild = client.get_guild(int(config['discordGuildID']))
-        member = await guild.fetch_member(ctx.user.id)
+        member = await guild.fetch_member(ctx.author.id)
         memberRoles = member.roles
     else:
         memberRoles = ctx.author.roles

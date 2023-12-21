@@ -206,9 +206,11 @@ async def startServerCommand(ctx: discord.Interaction, serverchoice: app_command
         else:
             memberRoles = ctx.user.roles
         if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
-            await ctx.response.send_message('Starting Counter Strike server.', delete_after=30)
-            command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
-                                        server_info.serverList[serverchoice.name].controllerPort, '-start-server')
+            await ctx.response.send_message('Starting Counter Strike server.', delete_after=30)        
+            loop = asyncio.get_event_loop()
+            ip = server_info.serverList[serverchoice.name].ip
+            port = server_info.serverList[serverchoice.name].controllerPort
+            await loop.run_in_executor(None, command_sender.sendCMD, ip, port, '-start-server')
         else:
             await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
     else:
@@ -248,9 +250,11 @@ async def restartServerCommand(ctx: discord.Interaction, serverchoice: app_comma
         else:
             memberRoles = ctx.user.roles
         if await checkIfUserHasRole(memberRoles, int(config['discordAdminRole'])):
-            await ctx.response.send_message('Restarting Counter Strike server.', delete_after=30)
-            command_sender.sendCMD(server_info.serverList[serverchoice.name].ip,
-                                        server_info.serverList[serverchoice.name].controllerPort, '-restart-server')
+            await ctx.response.send_message('Restarting Counter Strike server.', delete_after=30)            
+            loop = asyncio.get_event_loop()
+            ip = server_info.serverList[serverchoice.name].ip
+            port = server_info.serverList[serverchoice.name].controllerPort
+            await loop.run_in_executor(None, command_sender.sendCMD, ip, port, '-restart-server')
         else:
             await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
     else:

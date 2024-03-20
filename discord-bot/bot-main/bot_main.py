@@ -14,7 +14,7 @@ import datetime
 from concurrent.futures import ThreadPoolExecutor
 
 # Intents, tree inits, globals
-__version__ = '2.0.3'
+__version__ = '2.0.4'
 __requiredControllerVersion__ = '1.0.1'
 intents = discord.Intents.default()
 intents.message_content = True
@@ -162,7 +162,7 @@ async def checkIfUserHasRole(roles, roleID):
 # Re-scramble teams using players who have already readied up.
 async def rescrambleTenMans(ctx):
     sortedList[ctx.guild.id] = await randomizeTeams(sortedList[ctx.guild.id])
-    await ctx.channel.send(f'New Teams:\nTeam 1: {sortedList[ctx.guild.id][0].mention}, {sortedList[ctx.guild.id][1].mention}, {sortedList[ctx.guild.id][2].mention}, {sortedList[ctx.guild.id][3].mention}, {sortedList[ctx.guild.id][4].mention}\nTeam 2: {sortedList[ctx.guild.id][5].mention}, {sortedList[ctx.guild.id][6].mention}, {sortedList[ctx.guild.id][7].mention}, {sortedList[ctx.guild.id][8].mention}, {sortedList[ctx.guild.id][9].mention}')
+    await ctx.channel.send(f'New Teams:\nTeam 1: {sortedList[ctx.guild.id][0].mention}, {sortedList[ctx.guild.id][1].mention}, {sortedList[ctx.guild.id][2].mention}, {sortedList[ctx.guild.id][3].mention}, {sortedList[ctx.guild.id][4].mention}\nTeam 2: {sortedList[ctx.guild.id][5].mention}, {sortedList[ctx.guild.id][6].mention}, {sortedList[ctx.guild.id][7].mention}, {sortedList[ctx.guild.id][8].mention}, {sortedList[ctx.guild.id][9].mention}', delete_after=10)
 
 # Ten mans discord command
 @tree.command(name='ten-mans', description='start 10 mans')

@@ -13,6 +13,11 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S
 async def gamemodeStart(host, port, gamemode):
     if gamemode == 'nade-practice':
         sendCMD(host, port, 'exec nadeprac')
+    elif gamemode == 'wingman':
+        sendCMD(host, port, 'game_mode 2')
+        sendCMD(host, port, 'exec gamemode_competitive2v2.cfg')
+        sendCMD(host, port, '-reload-map')
+        
 
 # Send changelevel command to server
 async def changemap(host, port, map):

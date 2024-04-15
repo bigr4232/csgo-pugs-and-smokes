@@ -420,7 +420,7 @@ async def checkControllerVerion():
 @client.event
 async def on_ready():
     logger.info(f'Starting bot v{__version__}')
-    #await tree.sync()
+    await tree.sync()
     logger.debug("commands synced")
     await checkControllerVerion()
     await command_sender.automatedUpdateServer()

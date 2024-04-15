@@ -171,6 +171,7 @@ async def parseCommand(cmd):
             await reloadMap()
     else:
         if 'changelevel' in cmd:
+            global currentMap
             currentMap = cmd[cmd.find('de_'):]
         await sendCMD(cmd)
     return returnVal

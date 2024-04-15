@@ -412,7 +412,7 @@ async def checkControllerVerion():
         message = 'The following servers have out of date controllers and should be updated before using the bot with them:'
         for server in incompatibleServers:
             message += '\n' + server
-        channel = client.get_channel(config['discordChannel'])
+        channel = client.get_channel(int(config['discordChannel']))
         await channel.send(message)
         logger.info(message)
 
@@ -420,7 +420,7 @@ async def checkControllerVerion():
 @client.event
 async def on_ready():
     logger.info(f'Starting bot v{__version__}')
-    await tree.sync()
+    #await tree.sync()
     logger.debug("commands synced")
     await checkControllerVerion()
     await command_sender.automatedUpdateServer()

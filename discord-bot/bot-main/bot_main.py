@@ -263,15 +263,17 @@ async def restartServerCommand(ctx: discord.Interaction, serverchoice: app_comma
 # Start gamemode
 @tree.command(name='gamemode', description='start gamemode on the server specified by the option')
 @app_commands.choices(serverchoice=[app_commands.Choice(name=serverID, value=serverID) for serverID in server_info.serverList.keys()])
-@app_commands.choices(option=[app_commands.Choice(name='nade-practice', value='nade-practice')])
+@app_commands.choices(option=[app_commands.Choice(name='nade-practice', value='nade-practice'),
+                              app_commands.Choice(name='wingman', value='wingman')])
 async def serverGameModeCommand(ctx: discord.Interaction, option: app_commands.Choice[str], serverchoice: app_commands.Choice[str]):
     if serverchoice.name not in incompatibleServers:
         logger.info(f'{ctx.user.name} called server command gamemode with option {option.name}')
         await ctx.response.send_message(f'Switching server to gamemode {option.value}', delete_after=30)
         global gamemode
-        gamemode = 'nade-practice'
+        gamemode = option.value
         await command_sender.gamemodeStart(server_info.serverList[serverchoice.name].ip,
                                         server_info.serverList[serverchoice.name].controllerPort, option.value)
+
     else:
         await ctx.response.send_message('Please update the server controller of this server to use it.')
 
@@ -318,6 +320,12 @@ async def sendServerCommand(ctx: discord.Interaction, command: str, serverchoice
             await ctx.response.send_message('This command must be run by a Counter Strike server admin.', delete_after=30)
     else:
         await ctx.response.send_message('Please update the server controller of this server to use it.')
+
+# Get server info command
+@tree.command(name='get-server-info', description='Get info to connect to cs server')
+async def getServerInfo(ctx: discord.Interaction):
+    logger.info(f'{ctx.user.name} called server command get-server-info')
+    await ctx.response.send_message(f'Servers:', view=ServerSelectView())
 
 # Command to update server
 @tree.command(name='update-server', description='Update cs2 server if there is an update available')

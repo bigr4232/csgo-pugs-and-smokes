@@ -8,7 +8,7 @@ import sys
 import datetime
 
 # Globals
-__version__ = '1.0.1'
+__version__ = '1.1.0'
 content = config_loader.loadYaml()
 HOST = '0.0.0.0'
 PORT = int(content['PORT'])
@@ -18,6 +18,9 @@ if '-port' in content['startCommand']:
     csServerPort = portStr[0:portStr.find(' ')]
 else:
     csServerPort = '27015'
+
+currentMap = content['startCommand'][content['startCommand'].find('+map')+5:]
+currentMap = currentMap[:currentMap.find(' ')]
 
 # Get input args
 debugMode = False
@@ -136,6 +139,11 @@ async def getPassword():
     response = await getServerOutput('sv_password')
     return response
 
+# Reload map on server
+async def reloadMap():
+    cmd = await initCommand(f'changelevel {currentMap}')
+    subprocess.run(cmd)
+
 # Parse command sent
 # Returns string or '' for value not needed on return
 async def parseCommand(cmd):
@@ -159,7 +167,11 @@ async def parseCommand(cmd):
             returnVal = str(await serverRunning())
         elif cmd[1:] == 'controller-version':
             returnVal = __version__
+        elif cmd[1:] == 'reload-map':
+            await reloadMap()
     else:
+        if 'changelevel' in cmd:
+            currentMap = cmd[cmd.find('de_'):]
         await sendCMD(cmd)
     return returnVal
 

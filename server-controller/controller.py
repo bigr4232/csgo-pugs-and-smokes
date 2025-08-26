@@ -8,7 +8,7 @@ import sys
 import datetime
 
 # Globals
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 content = config_loader.loadYaml()
 HOST = '0.0.0.0'
 PORT = int(content['PORT'])

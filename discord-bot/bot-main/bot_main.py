@@ -14,7 +14,7 @@ import datetime
 from concurrent.futures import ThreadPoolExecutor
 
 # Intents, tree inits, globals
-__version__ = '2.1.0'
+__version__ = '2.1.1'
 __requiredControllerVersion__ = '1.1.0'
 intents = discord.Intents.default()
 intents.message_content = True

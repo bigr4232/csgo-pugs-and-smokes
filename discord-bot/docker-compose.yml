@@ -1,5 +1,5 @@
 services:
-  steamauthkeydiscordbot:
+  csdiscordbot:
     image: cs-discord-bot
     container_name: cs-discord-bot
     build:
